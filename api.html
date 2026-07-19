@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; Open-rppg 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="直播心率补光插件" href="live_stream_plugin.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Open-rppg
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Open-rppg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="product_form.html">产品形态探索：面向高危岗位的 rPPG 安全备份</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_stream_plugin.html">直播心率补光插件</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-interface">Core Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rppg.Model"><code class="docutils literal notranslate"><span class="pre">rppg.Model</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.process_video"><code class="docutils literal notranslate"><span class="pre">rppg.Model.process_video()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.video_capture"><code class="docutils literal notranslate"><span class="pre">rppg.Model.video_capture()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.process_video_tensor"><code class="docutils literal notranslate"><span class="pre">rppg.Model.process_video_tensor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.process_faces_tensor"><code class="docutils literal notranslate"><span class="pre">rppg.Model.process_faces_tensor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.bvp"><code class="docutils literal notranslate"><span class="pre">rppg.Model.bvp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.hr"><code class="docutils literal notranslate"><span class="pre">rppg.Model.hr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.preview"><code class="docutils literal notranslate"><span class="pre">rppg.Model.preview</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rppg.Model.stop"><code class="docutils literal notranslate"><span class="pre">rppg.Model.stop()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#signal-processing-utilities">Signal Processing Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rppg.main.SQI"><code class="docutils literal notranslate"><span class="pre">rppg.main.SQI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rppg.main.get_hr"><code class="docutils literal notranslate"><span class="pre">rppg.main.get_hr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rppg.main.get_prv"><code class="docutils literal notranslate"><span class="pre">rppg.main.get_prv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rppg.main.detrend"><code class="docutils literal notranslate"><span class="pre">rppg.main.detrend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rppg.main.bandpass_filter"><code class="docutils literal notranslate"><span class="pre">rppg.main.bandpass_filter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Open-rppg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>This section provides detailed documentation for the core API of the <strong>Open-rppg</strong> toolbox.</p>
+<section id="core-interface">
+<h2>Core Interface<a class="headerlink" href="#core-interface" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Model</span></code> class is the primary entry point for all rPPG tasks. It encapsulates the complexity of different neural network architectures (like PhysMamba, TSCAN, etc.) into a unified interface.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rppg.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rppg.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FacePhys.rlap'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model" title="Link to this definition"></a></dt>
+<dd><p>The main wrapper class for rPPG inference. It handles the full pipeline: face detection, ROI signal extraction, and physiological metric calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> (<em>str</em>) – <p>The name of the neural network architecture to use. Defaults to <code class="docutils literal notranslate"><span class="pre">'FacePhys.rlap'</span></code>.</p>
+<p><strong>Supported Models:</strong></p>
+<ul class="simple">
+<li><p><strong>State-Space Models (SSM):</strong> <code class="docutils literal notranslate"><span class="pre">'FacePhys.rlap'</span></code> (Default), <code class="docutils literal notranslate"><span class="pre">'ME-chunk'</span></code>, <code class="docutils literal notranslate"><span class="pre">'ME-flow'</span></code>, <code class="docutils literal notranslate"><span class="pre">'PhysMamba'</span></code>, <code class="docutils literal notranslate"><span class="pre">'RhythmMamba'</span></code>.</p></li>
+<li><p><strong>Transformer / Attention:</strong> <code class="docutils literal notranslate"><span class="pre">'PhysFormer'</span></code>, <code class="docutils literal notranslate"><span class="pre">'TSCAN'</span></code>, <code class="docutils literal notranslate"><span class="pre">'EfficientPhys'</span></code>.</p></li>
+<li><p><strong>Convolutional:</strong> <code class="docutils literal notranslate"><span class="pre">'PhysNet'</span></code>.</p></li>
+</ul>
+<p><em>Note: Append</em> <code class="docutils literal notranslate"><span class="pre">.rlap</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">.pure</span></code> <em>to the model name to specify weights (e.g.,</em> <code class="docutils literal notranslate"><span class="pre">'PhysNet.pure'</span></code> <em>).</em></p>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rppg.Model.process_video">
+<span class="sig-name descname"><span class="pre">process_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vid_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model.process_video" title="Link to this definition"></a></dt>
+<dd><p>Processes a video file from start to finish to extract physiological signals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vid_path</strong> (<em>str</em>) – Path to the input video file (e.g., <code class="docutils literal notranslate"><span class="pre">.mp4</span></code>, <code class="docutils literal notranslate"><span class="pre">.avi</span></code>, <code class="docutils literal notranslate"><span class="pre">.mkv</span></code>).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the estimated heart rate (<code class="docutils literal notranslate"><span class="pre">'hr'</span></code>), signal quality (<code class="docutils literal notranslate"><span class="pre">'SQI'</span></code>), and other metrics.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rppg.Model.video_capture">
+<span class="sig-name descname"><span class="pre">video_capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vid_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model.video_capture" title="Link to this definition"></a></dt>
+<dd><p>A context manager for processing real-time video streams or video files frame-by-frame.
+It initializes a background thread for non-blocking inference.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vid_path</strong> – The device index (int) for webcams or the file path (str) for video files. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The instance itself (context manager).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rppg.Model.process_video_tensor">
+<span class="sig-name descname"><span class="pre">process_video_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model.process_video_tensor" title="Link to this definition"></a></dt>
+<dd><p>Processes a pre-loaded video tensor (uint8). Useful for integration with existing data pipelines where the video is already in memory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor</strong> (<em>numpy.ndarray</em>) – A 4D tensor of shape <code class="docutils literal notranslate"><span class="pre">(Frames,</span> <span class="pre">Height,</span> <span class="pre">Width,</span> <span class="pre">3)</span></code>.</p></li>
+<li><p><strong>fps</strong> (<em>float</em>) – The frame rate of the video data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the analysis results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rppg.Model.process_faces_tensor">
+<span class="sig-name descname"><span class="pre">process_faces_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model.process_faces_tensor" title="Link to this definition"></a></dt>
+<dd><p>Processes a pre-cropped face tensor, skipping the internal face detection step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor</strong> (<em>numpy.ndarray</em>) – A 4D tensor of shape <code class="docutils literal notranslate"><span class="pre">(Frames,</span> <span class="pre">Height,</span> <span class="pre">Width,</span> <span class="pre">3)</span></code>.</p></li>
+<li><p><strong>fps</strong> (<em>float</em>) – The frame rate of the video data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the analysis results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rppg.Model.bvp">
+<span class="sig-name descname"><span class="pre">bvp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model.bvp" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the Blood Volume Pulse (BVP) signal from the internal buffer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>float</em>) – Start time in seconds.</p></li>
+<li><p><strong>end</strong> (<em>float</em>) – End time in seconds. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, returns data up to the current timestamp.</p></li>
+<li><p><strong>raw</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, returns the raw model output. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, applies bandpass filtering and normalization.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple <code class="docutils literal notranslate"><span class="pre">(signal,</span> <span class="pre">timestamps)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rppg.Model.hr">
+<span class="sig-name descname"><span class="pre">hr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_hrv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model.hr" title="Link to this definition"></a></dt>
+<dd><p>Calculates heart rate and HRV metrics from the buffered signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>float</em>) – Start time in seconds.</p></li>
+<li><p><strong>end</strong> (<em>float</em>) – End time in seconds.</p></li>
+<li><p><strong>return_hrv</strong> (<em>bool</em>) – Whether to compute detailed HRV metrics (SDNN, RMSSD, etc.). Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary with keys <code class="docutils literal notranslate"><span class="pre">'hr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'SQI'</span></code>, <code class="docutils literal notranslate"><span class="pre">'hrv'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'latency'</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rppg.Model.preview">
+<span class="sig-name descname"><span class="pre">preview</span></span><a class="headerlink" href="#rppg.Model.preview" title="Link to this definition"></a></dt>
+<dd><p>A generator property used in the <code class="docutils literal notranslate"><span class="pre">video_capture</span></code> loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(frame,</span> <span class="pre">box)</span></code> where <code class="docutils literal notranslate"><span class="pre">frame</span></code> is the current RGB image and <code class="docutils literal notranslate"><span class="pre">box</span></code> is the face bounding box coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rppg.Model.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rppg.Model.stop" title="Link to this definition"></a></dt>
+<dd><p>Stops the running inference thread. Called automatically when exiting the context manager.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="signal-processing-utilities">
+<h2>Signal Processing Utilities<a class="headerlink" href="#signal-processing-utilities" title="Link to this heading"></a></h2>
+<p>These helper functions are available in <code class="docutils literal notranslate"><span class="pre">rppg.main</span></code> for post-processing physiological signals.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rppg.main.SQI">
+<span class="sig-prename descclassname"><span class="pre">rppg.main.</span></span><span class="sig-name descname"><span class="pre">SQI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.main.SQI" title="Link to this definition"></a></dt>
+<dd><p>Calculates the Signal Quality Index (SQI) to assess the reliability of the rPPG signal.
+It uses an autocorrelation-based method to determine if the signal has a periodic physiological structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<em>numpy.ndarray</em>) – The input BVP signal array.</p></li>
+<li><p><strong>sr</strong> (<em>int</em>) – Sampling rate in Hz. Defaults to 30.</p></li>
+<li><p><strong>min_freq</strong> (<em>float</em>) – Minimum expected human pulse frequency (Hz).</p></li>
+<li><p><strong>max_freq</strong> (<em>float</em>) – Maximum expected human pulse frequency (Hz).</p></li>
+<li><p><strong>window_size</strong> (<em>int</em>) – Window size in seconds for sliding window calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A quality score between 0.0 (noise) and 1.0 (clean signal).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rppg.main.get_hr">
+<span class="sig-prename descclassname"><span class="pre">rppg.main.</span></span><span class="sig-name descname"><span class="pre">get_hr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">180</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.main.get_hr" title="Link to this definition"></a></dt>
+<dd><p>Estimates the Heart Rate (HR) from a BVP signal using the frequency domain approach.
+It calculates the Power Spectral Density (PSD) using Welch’s method and finds the peak frequency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>numpy.ndarray</em>) – The input BVP signal.</p></li>
+<li><p><strong>sr</strong> (<em>int</em>) – Sampling rate in Hz.</p></li>
+<li><p><strong>min</strong> (<em>int</em>) – Minimum valid heart rate (BPM).</p></li>
+<li><p><strong>max</strong> (<em>int</em>) – Maximum valid heart rate (BPM).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Estimated Heart Rate in BPM.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rppg.main.get_prv">
+<span class="sig-prename descclassname"><span class="pre">rppg.main.</span></span><span class="sig-name descname"><span class="pre">get_prv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.main.get_prv" title="Link to this definition"></a></dt>
+<dd><p>Computes Pulse Rate Variability (PRV) metrics (time-domain and frequency-domain) using peak detection.
+This function wraps <code class="docutils literal notranslate"><span class="pre">heartpy</span></code> analysis to provide standard HRV metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>numpy.ndarray</em>) – The input BVP signal.</p></li>
+<li><p><strong>ts</strong> (<em>numpy.ndarray</em>) – Corresponding timestamps (optional).</p></li>
+<li><p><strong>sr</strong> (<em>int</em>) – Sampling rate in Hz.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing metrics such as <code class="docutils literal notranslate"><span class="pre">'sdnn'</span></code>, <code class="docutils literal notranslate"><span class="pre">'rmssd'</span></code>, <code class="docutils literal notranslate"><span class="pre">'pnn50'</span></code>, <code class="docutils literal notranslate"><span class="pre">'LF/HF'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'breathingrate'</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rppg.main.detrend">
+<span class="sig-prename descclassname"><span class="pre">rppg.main.</span></span><span class="sig-name descname"><span class="pre">detrend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.main.detrend" title="Link to this definition"></a></dt>
+<dd><p>Applies Smoothness Priors Detrending (SPD) to remove low-frequency non-stationary trends (such as motion artifacts) from the signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<em>numpy.ndarray</em>) – The raw input signal.</p></li>
+<li><p><strong>min_freq</strong> (<em>float</em>) – The cut-off frequency for the trend. Trends slower than this will be removed.</p></li>
+<li><p><strong>sr</strong> (<em>int</em>) – Sampling rate in Hz.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The detrended signal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rppg.main.bandpass_filter">
+<span class="sig-prename descclassname"><span class="pre">rppg.main.</span></span><span class="sig-name descname"><span class="pre">bandpass_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowcut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highcut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rppg.main.bandpass_filter" title="Link to this definition"></a></dt>
+<dd><p>Applies a standard Butterworth bandpass filter to the signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – Input signal.</p></li>
+<li><p><strong>lowcut</strong> (<em>float</em>) – Low frequency cutoff (Hz). Defaults to 0.5 (30 BPM).</p></li>
+<li><p><strong>highcut</strong> (<em>float</em>) – High frequency cutoff (Hz). Defaults to 3.0 (180 BPM).</p></li>
+<li><p><strong>fs</strong> (<em>int</em>) – Sampling frequency (Hz).</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of the filter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered signal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="live_stream_plugin.html" class="btn btn-neutral float-left" title="直播心率补光插件" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Kegang Wang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

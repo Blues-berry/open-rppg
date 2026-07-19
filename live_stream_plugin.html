@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>直播心率补光插件 &mdash; Open-rppg 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="产品形态探索：面向高危岗位的 rPPG 安全备份" href="product_form.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Open-rppg
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Open-rppg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="product_form.html">产品形态探索：面向高危岗位的 rPPG 安全备份</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">直播心率补光插件</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">服务对象</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#obs-b">第一阶段：OBS + B站</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">为什么不再让网页采集</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">补光策略</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">当前能力</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">迭代路线</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">产品边界</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Open-rppg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">直播心率补光插件</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/live_stream_plugin.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>直播心率补光插件<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>直播场景是 rPPG 的另一个更轻、更容易被感知的落地方向：主播本来就需要摄像头和补光灯，如果补光设备或直播插件能顺手提供心率 Overlay，就可以把“稳定补光”和“非接触心率检测”合成一个产品体验。</p>
+<section id="id2">
+<h2>服务对象<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>第一版插件优先服务三类人：</p>
+<ul class="simple">
+<li><p><strong>主播和内容创作者</strong>：在直播中展示实时心率，用于运动、游戏、带货、情绪挑战、健康类内容。</p></li>
+<li><p><strong>直播运营和 MCN</strong>：把心率作为互动素材，增强直播间可看性和话题性。</p></li>
+<li><p><strong>补光灯/摄像头硬件厂商</strong>：把 rPPG 做成差异化卖点，而不是只卷亮度、色温和外观。</p></li>
+</ul>
+</section>
+<section id="obs-b">
+<h2>第一阶段：OBS + B站<a class="headerlink" href="#obs-b" title="Link to this heading"></a></h2>
+<p>当前仓库提供了第一阶段原型：<code class="docutils literal notranslate"><span class="pre">demo/live-heart-light-plugin/</span></code>。</p>
+<p>它采用 <strong>Python 常驻采集服务 + OBS Browser Source + B站推流</strong>：</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model_server.py</span></code> 独立打开摄像头，持续读取 30fps 视频帧。</p></li>
+<li><p>服务端调用当前仓库的 <code class="docutils literal notranslate"><span class="pre">rppg.Model('FacePhys.rlap')</span></code> 和 <code class="docutils literal notranslate"><span class="pre">update_frame()</span></code>，复用仓库自带 BlazeFace/ONNX 人脸检测与追踪。</p></li>
+<li><p>服务端统一输出 HR、SQI、采集状态、无人脸状态和 Overlay 状态。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">camera.html</span></code> 作为 OBS 摄像头画面源。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">overlay.html</span></code> 作为 OBS 心率 Overlay。</p></li>
+<li><p>主播使用 OBS 推流到 B站测试直播间。</p></li>
+</ol>
+<p>这个阶段不做原生 OBS C++ 插件，也不接入 B站直播姬内部插件能力。目标是先验证“只要本地服务存在，全直播时段就能持续监测”，并避免普通网页切后台导致信号断链。</p>
+</section>
+<section id="id3">
+<h2>为什么不再让网页采集<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>普通网页不能保证后台持续采集。切换标签页、最小化窗口或页面进入后台时，浏览器可能节流 <code class="docutils literal notranslate"><span class="pre">requestAnimationFrame</span></code>、摄像头帧和定时器。rPPG 又依赖连续、稳定、带真实时间戳的人脸颜色序列，因此网页采集一旦中断，模型窗口就需要重新积累。</p>
+<p>第一阶段改为后端常驻采集后，控制台页面只是调试面板；关闭控制台、切屏、最小化浏览器，都不会中断摄像头输入和模型推理。</p>
+</section>
+<section id="id4">
+<h2>补光策略<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>这个方向真正有意思的地方不是“摄像头也能测心率”，而是补光灯可以主动帮助 rPPG：</p>
+<ul class="simple">
+<li><p>测量期间锁定亮度和色温，避免灯光闪烁导致信号污染。</p></li>
+<li><p>发现脸部过暗或过曝时，提示主播调整补光亮度和角度。</p></li>
+<li><p>心率 Overlay 可以轻微脉动，但真实补光不应跟着快速闪烁。</p></li>
+<li><p>后续硬件版可以把补光灯、摄像头、rPPG 推理和直播 Overlay 做成一体。</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>当前能力<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>使用项目现有 FacePhys 模型输出 HR/SQI。</p></li>
+<li><p>服务端独立采集摄像头，网页不是采集生命线。</p></li>
+<li><p>Overlay 直接轮询服务端状态，不依赖控制台页面写 <code class="docutils literal notranslate"><span class="pre">localStorage</span></code>。</p></li>
+<li><p>摄像头停止、无人脸或 SQI 偏低时，Overlay 不继续沿用旧 BPM。</p></li>
+<li><p>保留低 SQI 预览状态，但直播输出阈值保持 <code class="docutils literal notranslate"><span class="pre">SQI</span> <span class="pre">&gt;=</span> <span class="pre">0.38</span></code>。</p></li>
+<li><p>OBS 中添加 <code class="docutils literal notranslate"><span class="pre">camera.html</span></code> 和 <code class="docutils literal notranslate"><span class="pre">overlay.html</span></code> 两个 Browser Source 即可测试。</p></li>
+<li><p>支持上传已有视频离线分析 HR/SQI，用于复盘素材或无摄像头时演示模型能力。</p></li>
+</ul>
+</section>
+<section id="id6">
+<h2>迭代路线<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>第一阶段：OBS + B站原型</p>
+<ul class="simple">
+<li><p>Python 服务常驻采集摄像头。</p></li>
+<li><p>OBS Browser Source 显示摄像头画面和心率 Overlay。</p></li>
+<li><p>控制台支持上传视频，单独跑 FacePhys 离线分析，不污染直播采集窗口。</p></li>
+<li><p>完成 30-60 分钟测试直播，记录 input FPS、SQI、BPM 输出率、无人脸次数、CPU/内存。</p></li>
+</ul>
+<p>第二阶段：直播工程化</p>
+<ul class="simple">
+<li><p>支持选择摄像头设备、分辨率和帧率。</p></li>
+<li><p>加入本地服务启动器、异常恢复和看门狗。</p></li>
+<li><p>支持 OBS Virtual Camera 或虚拟摄像头输出，为抖音、快手、小红书等闭源直播工具做准备。</p></li>
+</ul>
+<p>第三阶段：补光灯硬件联动</p>
+<ul class="simple">
+<li><p>控制亮度、色温和测量锁定模式。</p></li>
+<li><p>对接 USB/Bluetooth/Wi-Fi 补光灯。</p></li>
+<li><p>为游戏、运动、带货、教学等直播类型提供不同 Overlay 模板。</p></li>
+</ul>
+</section>
+<section id="id7">
+<h2>产品边界<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<p>直播插件展示的是“直播互动心率”或“状态氛围”，不是医疗监测。页面需要明确提示结果仅用于内容互动和体验展示，不用于诊断、治疗或健康决策。</p>
+<p>现有 rPPG 模型不能原样直接嵌入纯网页。当前仓库的主模型依赖 Python、Keras/JAX、自定义层、<code class="docutils literal notranslate"><span class="pre">.weights.h5</span></code> 权重和 <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code> 推理；浏览器无法直接执行这条链路。因此第一阶段采用本地模型服务接入现有模型。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="product_form.html" class="btn btn-neutral float-left" title="产品形态探索：面向高危岗位的 rPPG 安全备份" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Kegang Wang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

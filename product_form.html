@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>产品形态探索：面向高危岗位的 rPPG 安全备份 &mdash; Open-rppg 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="直播心率补光插件" href="live_stream_plugin.html" />
+    <link rel="prev" title="Open-rppg" href="intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Open-rppg
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Open-rppg</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">产品形态探索：面向高危岗位的 rPPG 安全备份</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">核心定位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">可信采集校验</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">1. 设备与画面自检</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">2. 主动交互校验</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">3. 信号可信度门控</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">适合落地的岗位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">产品形态</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">1. 岗前可信准入</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">2. 班中安全哨兵</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sdk">3. 边缘盒子或 SDK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">4. 管理端看板</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id11">运行闭环</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id12">风险分级</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id13">岗位策略包</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sdk-api">SDK/API 形态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id14">试点验证设计</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id15">1. 能不能稳定采</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id16">2. 测得准不准</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">3. 提醒有没有价值</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#demo">Demo 原型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mvp">MVP 路线</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id18">成功指标</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id19">边界与风险</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="live_stream_plugin.html">直播心率补光插件</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Open-rppg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">产品形态探索：面向高危岗位的 rPPG 安全备份</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/product_form.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rppg">
+<h1>产品形态探索：面向高危岗位的 rPPG 安全备份<a class="headerlink" href="#rppg" title="Link to this heading"></a></h1>
+<p>Open-rppg 更适合被产品化为“非接触式生理状态安全备份”，而不是单独承担主要监测或医疗诊断职责。它的价值在于利用已有摄像头，在不额外穿戴设备的情况下，为高风险作业岗位提供一层低打扰、可持续、可解释的辅助预警。</p>
+<section id="id1">
+<h2>核心定位<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>产品应当围绕三个原则设计：</p>
+<ul class="simple">
+<li><p><strong>先验证环境，再输出结果</strong>：rPPG 对光照、运动、遮挡、摄像头质量和肤色反射变化敏感。系统必须先确认当前采集环境可信，否则只输出“不可用/需复测”，不能给出看似精确但不可靠的数值。</p></li>
+<li><p><strong>作为安全备份，而非主监测手段</strong>：在驾驶、列车巡检、飞行、精密流水线、无尘车间等场景中，rPPG 只作为现有安全系统、人工流程、穿戴设备或岗位规程的补充证据。</p></li>
+<li><p><strong>关注趋势和风险状态，而非单次数值</strong>：产品层不应把心率、HRV 等指标包装成确定性诊断，而应输出“采集可信度、状态趋势、异常置信度、建议动作”。</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>可信采集校验<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>正式检测前需要有一个类似人脸识别活体检测的“环境与采集可信度校验”流程。这个流程的目的不是证明人是谁，而是证明后续 rPPG 信号有足够好的采集条件。</p>
+<section id="id3">
+<h3>1. 设备与画面自检<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>系统启动后先检查摄像头和画面质量：</p>
+<ul class="simple">
+<li><p>摄像头分辨率、帧率、延迟是否达到模型要求。</p></li>
+<li><p>人脸是否稳定出现在画面中，ROI 面积是否足够，面部是否过暗、过曝或被口罩、防护镜、帽檐严重遮挡。</p></li>
+<li><p>环境光是否稳定，是否存在频闪、强背光、剧烈色偏或屏幕反光。</p></li>
+<li><p>自动曝光、自动白平衡是否导致颜色通道持续漂移；必要时提示固定机位、补光或锁定曝光参数。</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>2. 主动交互校验<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>借鉴人脸识别中的眨眼、张嘴、多色验证，可以设计轻量的主动挑战：</p>
+<ul class="simple">
+<li><p><strong>眨眼/张嘴/轻微转头</strong>：确认当前检测到的是实时人脸，并验证面部关键区域没有被静态照片、视频回放或遮挡物替代。</p></li>
+<li><p><strong>多色光校验</strong>：通过屏幕或小型指示灯依次显示红、绿、蓝、白等颜色，检查摄像头对颜色变化的响应是否正常，并识别明显的色彩失真、曝光锁死或通道异常。</p></li>
+<li><p><strong>静止采样窗口</strong>：要求用户保持 10-30 秒相对稳定姿态，系统评估 BVP 波形、频域峰值、SQI、丢帧率和人脸跟踪稳定性。</p></li>
+</ul>
+<p>只有当以上校验通过后，系统才进入正式监测。校验失败时，产品应给出明确原因，例如“光照不稳定”“人脸 ROI 过小”“信号质量不足”，而不是输出低可信度心率。</p>
+</section>
+<section id="id5">
+<h3>3. 信号可信度门控<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>运行中也要持续门控检测结果：</p>
+<ul class="simple">
+<li><p>SQI 低于阈值时暂停输出生理状态，仅显示采集质量问题。</p></li>
+<li><p>心率结果超出生理合理范围或短时间剧烈跳变时，标记为异常采集而非异常人体状态。</p></li>
+<li><p>当面部跟踪丢失、姿态变化过大、遮挡增加或光照突变时，自动降级到“观察中/不可判定”。</p></li>
+<li><p>只有连续多个时间窗都满足质量条件，才触发风险趋势判断。</p></li>
+</ul>
+</section>
+</section>
+<section id="id6">
+<h2>适合落地的岗位<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>优先选择“事故代价高、人员姿态相对固定、已有摄像头基础、可以接受周期性校验”的岗位。</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>场景</p></th>
+<th class="head"><p>适配原因</p></th>
+<th class="head"><p>产品形态</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>驾驶员、工程车辆操作员</p></td>
+<td><p>座位固定，已有 DMS/车载摄像头，疲劳或突发不适风险高</p></td>
+<td><p>车载辅助安全模块，和 DMS、制动/语音提醒系统联动</p></td>
+</tr>
+<tr class="row-odd"><td><p>列车巡检员、调度/值守人员</p></td>
+<td><p>长时间值守，注意力和身体状态影响公共安全</p></td>
+<td><p>岗前校验 + 值守期间低频巡检提醒</p></td>
+</tr>
+<tr class="row-even"><td><p>飞行员、塔台/模拟训练人员</p></td>
+<td><p>安全等级高，流程标准化，适合先从训练和复盘切入</p></td>
+<td><p>训练舱状态记录、异常趋势复盘、人工确认提醒</p></td>
+</tr>
+<tr class="row-odd"><td><p>精密流水线操作员</p></td>
+<td><p>固定工位，误操作成本高，摄像头部署可控</p></td>
+<td><p>工位侧边缘设备，异常状态提醒班组长</p></td>
+</tr>
+<tr class="row-even"><td><p>无尘车间人员</p></td>
+<td><p>穿戴限制多，接触式设备不方便，环境可控</p></td>
+<td><p>固定机位 + 工位准入校验，但需处理口罩/护目镜遮挡限制</p></td>
+</tr>
+</tbody>
+</table>
+<p>不建议优先从泛健康、家庭医疗或消费级情绪检测切入。这些场景环境不可控、解释成本高、隐私敏感，且用户容易把结果误解为诊断结论。</p>
+</section>
+<section id="id7">
+<h2>产品形态<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<section id="id8">
+<h3>1. 岗前可信准入<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p>面向上岗前 30-60 秒的快速检测：</p>
+<ul class="simple">
+<li><p>完成人脸在位、活体动作、多色光、静止采样和 SQI 检查。</p></li>
+<li><p>生成本次班次的基础状态参考值。</p></li>
+<li><p>输出“通过、需重测、需人工确认”三类结果。</p></li>
+<li><p>只把 rPPG 作为准入流程中的一个辅助项，不单独决定人员能否上岗。</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>2. 班中安全哨兵<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>面向工作过程中的低打扰监测：</p>
+<ul class="simple">
+<li><p>持续采集，但只在信号质量达标时更新状态。</p></li>
+<li><p>关注趋势偏离、持续高负荷、疑似疲劳或突发异常，而非每秒展示心率。</p></li>
+<li><p>异常先进入“二次确认”：语音提示、屏幕确认、短暂停留、班组长复核，避免单次误报直接干预业务。</p></li>
+<li><p>与已有安全系统联动时，只提供辅助信号和置信度，不直接替代制动、停机、调度等主控制逻辑。</p></li>
+</ul>
+</section>
+<section id="sdk">
+<h3>3. 边缘盒子或 SDK<a class="headerlink" href="#sdk" title="Link to this heading"></a></h3>
+<p>更现实的商业形态可以是两层：</p>
+<ul class="simple">
+<li><p><strong>边缘盒子</strong>：接入摄像头，在本地完成画面校验、rPPG 推理、SQI 门控和事件生成，适合工厂、车队、轨交场站。</p></li>
+<li><p><strong>软件 SDK/API</strong>：提供 <code class="docutils literal notranslate"><span class="pre">采集质量</span> <span class="pre">-&gt;</span> <span class="pre">生理指标</span> <span class="pre">-&gt;</span> <span class="pre">风险状态</span> <span class="pre">-&gt;</span> <span class="pre">事件回调</span></code> 的标准接口，嵌入 DMS、工位管理、安监平台或训练复盘系统。</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>4. 管理端看板<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>管理端不应做成“实时监控每个人心率”的界面，而应聚焦安全运营：</p>
+<ul class="simple">
+<li><p>当前可用设备、采集质量、离线/遮挡/光照异常。</p></li>
+<li><p>按班次、岗位、设备统计的风险事件数量和人工确认结果。</p></li>
+<li><p>误报、漏报、复测率、有效采集率等产品质量指标。</p></li>
+<li><p>默认不存储原始视频，只保留必要的事件摘要、质量评分和审计记录。</p></li>
+</ul>
+</section>
+</section>
+<section id="id11">
+<h2>运行闭环<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p>一个可落地的系统不应只做“摄像头采集 -&gt; 心率输出”，而应设计成闭环状态机：</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>阶段</p></th>
+<th class="head"><p>系统动作</p></th>
+<th class="head"><p>输出</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>设备启动</p></td>
+<td><p>摄像头、帧率、延迟、光照、ROI 自检</p></td>
+<td><p>可用、需调整、不可用</p></td>
+</tr>
+<tr class="row-odd"><td><p>主动校验</p></td>
+<td><p>眨眼、张嘴、多色光、静止采样</p></td>
+<td><p>本次采集可信度</p></td>
+</tr>
+<tr class="row-even"><td><p>基线建立</p></td>
+<td><p>记录班次初始 HR、HRV、SQI 区间</p></td>
+<td><p>个人当班参考值</p></td>
+</tr>
+<tr class="row-odd"><td><p>班中监测</p></td>
+<td><p>滑动窗口采集，持续质量门控</p></td>
+<td><p>正常、观察中、不可判定</p></td>
+</tr>
+<tr class="row-even"><td><p>风险触发</p></td>
+<td><p>多窗口趋势偏离或突发异常</p></td>
+<td><p>风险事件和置信度</p></td>
+</tr>
+<tr class="row-odd"><td><p>二次确认</p></td>
+<td><p>语音/屏幕提示、人工复核、岗位系统确认</p></td>
+<td><p>解除、重测、升级处理</p></td>
+</tr>
+<tr class="row-even"><td><p>复盘回流</p></td>
+<td><p>保存事件摘要和确认结果</p></td>
+<td><p>阈值和策略优化依据</p></td>
+</tr>
+</tbody>
+</table>
+<p>这个闭环的关键是“不可判定”必须是一个正式状态。对于 rPPG 产品来说，承认当前环境不能可靠测量，比输出一个漂亮但不可信的数字更重要。</p>
+</section>
+<section id="id12">
+<h2>风险分级<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<p>建议把告警设计成渐进式，而不是二元化报警：</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>等级</p></th>
+<th class="head"><p>触发条件</p></th>
+<th class="head"><p>产品动作</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>L0 不输出</p></td>
+<td><p>SQI 不足、人脸丢失、强光/遮挡/运动过大</p></td>
+<td><p>提示采集条件问题，不判断人体状态</p></td>
+</tr>
+<tr class="row-odd"><td><p>L1 观察</p></td>
+<td><p>指标轻微偏离，但持续时间短或置信度一般</p></td>
+<td><p>本地记录，不打断工作</p></td>
+</tr>
+<tr class="row-even"><td><p>L2 提醒</p></td>
+<td><p>多个窗口连续偏离，且采集质量稳定</p></td>
+<td><p>轻量提醒本人确认状态</p></td>
+</tr>
+<tr class="row-odd"><td><p>L3 复核</p></td>
+<td><p>趋势异常持续存在，或与疲劳/注意力系统信号一致</p></td>
+<td><p>通知班组长、调度或安全员复核</p></td>
+</tr>
+<tr class="row-even"><td><p>L4 联动</p></td>
+<td><p>外部主系统也确认风险，例如 DMS、人工确认或岗位规程触发</p></td>
+<td><p>进入既有安全处置流程</p></td>
+</tr>
+</tbody>
+</table>
+<p>其中 L4 不应由 rPPG 单独触发。对于驾驶、飞行、列车、工厂停机等高影响动作，rPPG 只能提供辅助证据，最终应由主安全系统、人工确认或既有规程决定。</p>
+</section>
+<section id="id13">
+<h2>岗位策略包<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<p>不同岗位不应共用一套阈值和交互。更合理的产品方式是预置“岗位策略包”，让部署人员按场景选择和微调。</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>策略包</p></th>
+<th class="head"><p>摄像头条件</p></th>
+<th class="head"><p>校验频率</p></th>
+<th class="head"><p>主要风险</p></th>
+<th class="head"><p>默认动作</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>车辆驾驶</p></td>
+<td><p>车内固定摄像头，支持夜间补光</p></td>
+<td><p>发车前 + 长途周期性复测</p></td>
+<td><p>疲劳、突发不适、注意力下降</p></td>
+<td><p>本人提醒，必要时交给 DMS 或车队平台</p></td>
+</tr>
+<tr class="row-odd"><td><p>固定工位</p></td>
+<td><p>工位侧前方或侧前方机位，光照可控</p></td>
+<td><p>上岗前 + 换班后</p></td>
+<td><p>疲劳、压力负荷、异常身体状态</p></td>
+<td><p>工位提示，班组长复核</p></td>
+</tr>
+<tr class="row-even"><td><p>调度值守</p></td>
+<td><p>桌面摄像头，人员坐姿稳定</p></td>
+<td><p>上岗前 + 低频静默复测</p></td>
+<td><p>长时间值守疲劳、注意力漂移</p></td>
+<td><p>轻提醒和轮岗建议</p></td>
+</tr>
+<tr class="row-odd"><td><p>飞行训练</p></td>
+<td><p>模拟舱或训练舱摄像头</p></td>
+<td><p>训练前 + 训练后复盘</p></td>
+<td><p>高压负荷、训练表现波动</p></td>
+<td><p>训练记录，不直接干预飞行流程</p></td>
+</tr>
+<tr class="row-even"><td><p>无尘车间</p></td>
+<td><p>固定机位，面部遮挡多</p></td>
+<td><p>准入前 + 工位可用性巡检</p></td>
+<td><p>穿戴遮挡导致不可测、异常疲劳</p></td>
+<td><p>优先输出可用性，不强行判断状态</p></td>
+</tr>
+</tbody>
+</table>
+<p>策略包至少需要配置这些参数：</p>
+<ul class="simple">
+<li><p>最低帧率、最低 ROI 面积、允许的头部姿态范围。</p></li>
+<li><p>初始采样窗口和运行中滑动窗口长度。</p></li>
+<li><p>SQI 阈值、连续有效窗口数量、异常趋势持续时间。</p></li>
+<li><p>是否允许保存事件截图、是否保存原始视频、保存时长。</p></li>
+<li><p>提醒对象、升级路径、人工确认入口。</p></li>
+</ul>
+</section>
+<section id="sdk-api">
+<h2>SDK/API 形态<a class="headerlink" href="#sdk-api" title="Link to this heading"></a></h2>
+<p>如果将 Open-rppg 封装成产品 SDK，可以把输出分成三层，而不是只暴露心率：</p>
+<ol class="arabic simple">
+<li><p><strong>采集质量层</strong>：判断当前画面是否可用。</p></li>
+<li><p><strong>生理指标层</strong>：在质量达标时输出 HR、HRV、BVP、SQI。</p></li>
+<li><p><strong>安全事件层</strong>：结合岗位策略输出风险状态和建议动作。</p></li>
+</ol>
+<p>示例事件结构：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;worker_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hashed-or-local-id&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;station_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;line-a-03&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-30T10:20:30+08:00&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;capture_quality&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;usable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;sqi&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.86</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;face_track_stability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.93</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;lighting_stability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.91</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;signals&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;hr_bpm&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">82.4</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hrv_status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;within_shift_baseline&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;window_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;risk&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;L1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mild_trend_deviation&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.62</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;recommended_action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;observe&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>这个接口表达的重点是：当 <code class="docutils literal notranslate"><span class="pre">capture_quality.usable</span></code> 为 <code class="docutils literal notranslate"><span class="pre">false</span></code> 时，调用方不应该读取或展示 <code class="docutils literal notranslate"><span class="pre">signals</span></code> 作为可靠结论。</p>
+</section>
+<section id="id14">
+<h2>试点验证设计<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<p>产品试点可以拆成三个问题逐步验证：</p>
+<section id="id15">
+<h3>1. 能不能稳定采<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>先不追求告警，只看真实岗位中的采集可用性：</p>
+<ul class="simple">
+<li><p>每天每个岗位有多少时间窗通过质量门控。</p></li>
+<li><p>哪些失败来自光照、遮挡、姿态、摄像头或人员移动。</p></li>
+<li><p>主动校验平均耗时和复测率是否可接受。</p></li>
+</ul>
+</section>
+<section id="id16">
+<h3>2. 测得准不准<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<p>在受控试点中对照接触式设备，但结论仍应表达为工程指标：</p>
+<ul class="simple">
+<li><p>HR 与参考设备的误差分布。</p></li>
+<li><p>不同光照、肤色、年龄、眼镜、口罩、防护装备下的可用率。</p></li>
+<li><p>模型在运动、说话、低头、转头时的降级是否及时。</p></li>
+</ul>
+</section>
+<section id="id17">
+<h3>3. 提醒有没有价值<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<p>最后才验证风险事件：</p>
+<ul class="simple">
+<li><p>系统提醒后，人工确认是否认为有处理价值。</p></li>
+<li><p>提醒是否过多打扰正常工作。</p></li>
+<li><p>是否能发现“人没主动报告，但确实需要休息、复测或换岗”的情况。</p></li>
+<li><p>误报被如何解释，是否能通过采集质量、岗位策略或阈值调优降低。</p></li>
+</ul>
+<p>试点早期的目标不是证明系统可以自动替代人，而是证明它能在不增加太多负担的情况下，稳定提供一层额外的安全观察。</p>
+</section>
+</section>
+<section id="demo">
+<h2>Demo 原型<a class="headerlink" href="#demo" title="Link to this heading"></a></h2>
+<p>当前仓库提供了一个可运行的交互 Demo：<code class="docutils literal notranslate"><span class="pre">demo/self-validating-camera/</span></code>。它不把重点放在“摄像头测心率”，而是展示一个更有辨识度的产品逻辑：相机先完成自证可信，再开放生理状态和安全事件输出。</p>
+<p>Demo 面向三类观众：</p>
+<ul class="simple">
+<li><p><strong>一线岗位人员</strong>：看到系统不会在采集不可信时强行判断自己。</p></li>
+<li><p><strong>安全管理者</strong>：看到风险事件来自证据链，而不是单个心率数字。</p></li>
+<li><p><strong>系统集成方</strong>：看到 SDK/API 如何输出 <code class="docutils literal notranslate"><span class="pre">capture_quality</span></code>、<code class="docutils literal notranslate"><span class="pre">signals</span></code> 和 <code class="docutils literal notranslate"><span class="pre">risk</span></code>。</p></li>
+</ul>
+<p>建议演示路径：</p>
+<ol class="arabic simple">
+<li><p>启动相机或进入模拟器，默认状态下心率输出被锁定。</p></li>
+<li><p>运行可信校验，依次展示设备自检、活体动作、多色响应、静止采样和证书生成。</p></li>
+<li><p>模拟光照突变或遮挡，展示系统进入“不可判定”，并拒绝输出生理结论。</p></li>
+<li><p>模拟风险趋势，展示在采集可信时如何输出 L2/L3 安全事件。</p></li>
+<li><p>展示 SDK JSON，让观众理解它如何接入 DMS、安监平台或工位系统。</p></li>
+</ol>
+<p>这个 Demo 的创新点不是更炫的 UI，而是把 rPPG 包装成“可信采集协议 + 安全证据层”。它让产品从一个测量工具，变成一个知道自己什么时候可信、什么时候必须沉默的辅助安全系统。</p>
+</section>
+<section id="mvp">
+<h2>MVP 路线<a class="headerlink" href="#mvp" title="Link to this heading"></a></h2>
+<p>第一阶段可以从受控环境开始：</p>
+<ol class="arabic simple">
+<li><p>固定摄像头和补光条件，完成岗前可信采集校验。</p></li>
+<li><p>使用 <code class="docutils literal notranslate"><span class="pre">SQI</span></code>、人脸跟踪稳定性、光照稳定性作为结果输出门槛。</p></li>
+<li><p>在一个高危但流程可控的岗位做试点，例如固定工位操作员或驾驶模拟舱。</p></li>
+<li><p>先验证“有效采集率、复测率、人工确认后的误报率、用户接受度”，再讨论自动干预。</p></li>
+</ol>
+<p>第二阶段再进入班中监测：</p>
+<ol class="arabic simple">
+<li><p>增加滑动窗口趋势判断，避免单点报警。</p></li>
+<li><p>接入岗位系统或安监平台，只推送风险事件和置信度。</p></li>
+<li><p>建立人工确认闭环，把确认结果回流到阈值和场景策略中。</p></li>
+</ol>
+<p>第三阶段扩展到多岗位：</p>
+<ol class="arabic simple">
+<li><p>为驾驶、巡检、飞行训练、精密制造分别配置场景策略。</p></li>
+<li><p>针对口罩、防护镜、强光、夜间、震动等典型环境建立专门的不可用判定。</p></li>
+<li><p>建立隐私、合规、审计和数据留存策略，避免产品被误用为医疗诊断或过度劳动监控。</p></li>
+</ol>
+</section>
+<section id="id18">
+<h2>成功指标<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<p>产品验证应优先看这些指标：</p>
+<ul class="simple">
+<li><p><strong>有效采集率</strong>：在真实岗位中，有多少时间窗能通过环境和信号质量门控。</p></li>
+<li><p><strong>复测率</strong>：岗前校验中需要重复采样的比例。</p></li>
+<li><p><strong>误报率和确认率</strong>：系统提示的风险事件中，有多少被人工确认有处理价值。</p></li>
+<li><p><strong>响应收益</strong>：系统提示是否帮助提前发现疲劳、身体不适、注意力下降或设备环境问题。</p></li>
+<li><p><strong>用户接受度</strong>：员工是否认为它低打扰、可解释、不会被滥用于绩效监控。</p></li>
+</ul>
+</section>
+<section id="id19">
+<h2>边界与风险<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<p>这类产品必须把边界写清楚：</p>
+<ul class="simple">
+<li><p>不用于医疗诊断，不宣称可替代心电、血氧、血压或专业体检。</p></li>
+<li><p>不在低质量采集条件下输出确定数值。</p></li>
+<li><p>不把单次心率异常直接等同于危险行为或健康异常。</p></li>
+<li><p>不应单独作为处罚、停岗、保险、绩效评价依据。</p></li>
+<li><p>需要明确告知、授权、数据最小化、可审计和本地优先处理。</p></li>
+</ul>
+<p>最稳妥的产品叙事是：rPPG 不是“判断人是否安全”的裁判，而是高风险岗位里的一层额外传感器。它先证明自己看得清、信号可信，再在关键时刻提醒人和系统多看一眼。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="intro.html" class="btn btn-neutral float-left" title="Open-rppg" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="live_stream_plugin.html" class="btn btn-neutral float-right" title="直播心率补光插件" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Kegang Wang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
