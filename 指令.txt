@@ -1,0 +1,5 @@
+cd C:\Users\Bluesky\Desktop\test1\open-rppg
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+
+.\.venv\Scripts\python.exe live_cam_test.py

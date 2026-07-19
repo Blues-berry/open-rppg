@@ -1,0 +1,9 @@
+heartpy>=1.2
+jax>=0.4.26
+keras>=3.5.0
+onnxruntime>=1.8
+opencv_python>=4.5.5.64
+scipy>=1.8
+einops>=0.8 
+av>=13 
+#matplotlib<=3.9

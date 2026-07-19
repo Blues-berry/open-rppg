@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Video Heart</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header>
+        <strong>网页视频心率</strong>
+        <span id="serviceState">检测中</span>
+      </header>
+
+      <section class="status-card">
+        <div>
+          <span>HR</span>
+          <strong id="bpmText">--</strong>
+        </div>
+        <div>
+          <span>SQI</span>
+          <strong id="sqiText">--</strong>
+        </div>
+        <div>
+          <span>状态</span>
+          <strong id="statusText">待机</strong>
+        </div>
+        <div>
+          <span>帧数</span>
+          <strong id="frameText">0</strong>
+        </div>
+      </section>
+
+      <p id="hintText">打开一个正在播放普通视频的网页，然后开始检测。</p>
+
+      <div class="actions">
+        <button id="startBtn" type="button">检测心率</button>
+        <button id="stopBtn" type="button">停止</button>
+      </div>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

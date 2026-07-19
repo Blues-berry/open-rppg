@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "C:\Users\Bluesky\Desktop\test1\open-rppg\rppg\main.py", line 493, in inference
+    face_imgs = list(self.face_resampling_pool.map(lambda x:(x[0](), x[1]), face_imgs))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Bluesky\anaconda3\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Bluesky\anaconda3\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Bluesky\anaconda3\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Bluesky\anaconda3\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\Bluesky\anaconda3\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Bluesky\Desktop\test1\open-rppg\rppg\main.py", line 493, in <lambda>
+    face_imgs = list(self.face_resampling_pool.map(lambda x:(x[0](), x[1]), face_imgs))
+                                                             ^^^^^^
+TypeError: 'numpy.ndarray' object is not callable

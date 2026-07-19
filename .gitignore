@@ -1,0 +1,56 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+*.out.log
+*.err.log
+.rppg_jitted/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local assistant/editor/worktree state
+.claude/
+.agents/
+.codex/
+.worktrees/
+.vscode/
+.idea/
+portfolio/
+
+# Local/generated demo media and benchmark outputs
+_github_upload/
+demo/video_inputs/
+demo/video_outputs/
+demo/video_benchmark/_inspection/
+demo/video_benchmark/predictions/
+demo/video_benchmark/previews/
+demo/video_benchmark/rendered/
+demo/video_benchmark/reports/
+demo/video_benchmark/sources/
+demo/video_benchmark/truth/
+demo/live-heart-light-plugin/agent_logs/
+demo/live-heart-light-plugin/agent_config.local.json
+demo/live-heart-light-plugin/recordings/
+demo/live-heart-light-plugin/__pycache__/
+demo/browser-video-heart-extension/*.zip
+
+# Large local media
+*.mp4
+*.flv
+*.avi
+*.mov
+*.mkv
+*.webm
+
+# Downloaded model checkpoints (keep locally; do not publish with the web source)
+rppg/weights/*.h5
+
+# OS files
+.DS_Store
+Thumbs.db

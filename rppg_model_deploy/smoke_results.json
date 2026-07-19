@@ -1,0 +1,350 @@
+{
+  "default_model": "me_flow_rlap",
+  "summary": {
+    "selected": 6,
+    "ok": 6,
+    "failed": 0
+  },
+  "deployed_models": {
+    "me_flow_rlap": {
+      "key": "me_flow_rlap",
+      "display_name": "ME-flow.rlap",
+      "backend": "open-rppg bundled",
+      "model_name": "ME-flow.rlap",
+      "status": "deployed",
+      "profile": "single-frame low-latency state-space model",
+      "input_shape": [
+        1,
+        36,
+        36,
+        3
+      ],
+      "weights": [
+        "rppg/weights/ME.rlap.weights.h5",
+        "rppg/weights/state.pkl"
+      ],
+      "reference": "https://arxiv.org/abs/2504.01774",
+      "reason": "Newest bundled low-latency state-space route from the open-rppg author.",
+      "notes": ""
+    },
+    "facephys_rlap": {
+      "key": "facephys_rlap",
+      "display_name": "FacePhys.rlap",
+      "backend": "open-rppg bundled",
+      "model_name": "FacePhys.rlap",
+      "status": "deployed",
+      "profile": "single-frame optimized state-space model",
+      "input_shape": [
+        1,
+        36,
+        36,
+        3
+      ],
+      "weights": [
+        "rppg/weights/FacePhys.rlap.weights.h5"
+      ],
+      "reference": "https://github.com/KegangWangCCNU/open-rppg",
+      "reason": "Default robust model in current open-rppg release.",
+      "notes": ""
+    },
+    "me_chunk_rlap": {
+      "key": "me_chunk_rlap",
+      "display_name": "ME-chunk.rlap",
+      "backend": "open-rppg bundled",
+      "model_name": "ME-chunk.rlap",
+      "status": "deployed",
+      "profile": "chunk state-space model",
+      "input_shape": [
+        160,
+        36,
+        36,
+        3
+      ],
+      "weights": [
+        "rppg/weights/ME.rlap.weights.h5",
+        "rppg/weights/state.pkl"
+      ],
+      "reference": "https://arxiv.org/abs/2504.01774",
+      "reason": "Chunk inference variant for better throughput when latency is less critical.",
+      "notes": ""
+    },
+    "rhythmmamba_rlap": {
+      "key": "rhythmmamba_rlap",
+      "display_name": "RhythmMamba.rlap",
+      "backend": "open-rppg bundled",
+      "model_name": "RhythmMamba.rlap",
+      "status": "deployed",
+      "profile": "AAAI 2025 lightweight Mamba",
+      "input_shape": [
+        160,
+        128,
+        128,
+        3
+      ],
+      "weights": [
+        "rppg/weights/RhythmMamba.rlap.weights.h5"
+      ],
+      "reference": "https://ojs.aaai.org/index.php/AAAI/article/view/33082",
+      "reason": "Fast and lightweight Mamba-family rPPG model included in the toolbox.",
+      "notes": ""
+    },
+    "physmamba_rlap": {
+      "key": "physmamba_rlap",
+      "display_name": "PhysMamba.rlap",
+      "backend": "open-rppg bundled",
+      "model_name": "PhysMamba.rlap",
+      "status": "deployed",
+      "profile": "CCBR 2024 efficient Mamba",
+      "input_shape": [
+        128,
+        128,
+        128,
+        3
+      ],
+      "weights": [
+        "rppg/weights/PhysMamba.rlap.weights.h5"
+      ],
+      "reference": "https://link.springer.com/chapter/10.1007/978-981-96-1903-7_22",
+      "reason": "Efficient dual-branch Mamba architecture for remote physiological measurement.",
+      "notes": ""
+    },
+    "efficientphys_rlap": {
+      "key": "efficientphys_rlap",
+      "display_name": "EfficientPhys.rlap",
+      "backend": "open-rppg bundled",
+      "model_name": "EfficientPhys.rlap",
+      "status": "deployed",
+      "profile": "fast convolutional baseline",
+      "input_shape": [
+        160,
+        72,
+        72,
+        3
+      ],
+      "weights": [
+        "rppg/weights/EfficientPhys.rlap.weights.h5"
+      ],
+      "reference": "https://openaccess.thecvf.com/content/WACV2023/html/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.html",
+      "reason": "Small fast baseline that is useful as a fallback during model swaps.",
+      "notes": ""
+    }
+  },
+  "external_candidates": {
+    "rhythmjepa": {
+      "status": "reference_only",
+      "reference": "https://arxiv.org/abs/2606.31736",
+      "repository": "https://github.com/deconasser/RhythmJEPA",
+      "notes": "Very recent 2026 rPPG paper. Keep as a future backend after weights and runtime are verified."
+    },
+    "tyrppg": {
+      "status": "reference_only",
+      "reference": "https://arxiv.org/abs/2511.05833",
+      "repository": "https://github.com/Taixi-CHEN/TYrPPG",
+      "notes": "2025 lightweight Mambaout-style route. Needs separate dependency and checkpoint audit."
+    },
+    "reperio_rppg": {
+      "status": "reference_only",
+      "reference": "https://arxiv.org/abs/2511.05946",
+      "repository": "https://github.com/deconasser/Reperio-rPPG",
+      "notes": "2025 SOTA-oriented graph/transformer route; likely less lightweight than the deployed set."
+    }
+  },
+  "results": [
+    {
+      "model": "me_flow_rlap",
+      "display_name": "ME-flow.rlap",
+      "backend_model": "ME-flow.rlap",
+      "status": "ok",
+      "asset_check": {
+        "model": "me_flow_rlap",
+        "ok": true,
+        "files": [
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\ME.rlap.weights.h5",
+            "exists": true,
+            "size_bytes": 2362992
+          },
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\state.pkl",
+            "exists": true,
+            "size_bytes": 1633574
+          }
+        ]
+      },
+      "input_shape": [
+        1,
+        36,
+        36,
+        3
+      ],
+      "bvp_shape": [
+        1
+      ],
+      "bvp_mean": -0.146728515625,
+      "bvp_std": 0.0,
+      "finite": true,
+      "load_seconds": 22.292,
+      "inference_seconds": 0.031
+    },
+    {
+      "model": "facephys_rlap",
+      "display_name": "FacePhys.rlap",
+      "backend_model": "FacePhys.rlap",
+      "status": "ok",
+      "asset_check": {
+        "model": "facephys_rlap",
+        "ok": true,
+        "files": [
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\FacePhys.rlap.weights.h5",
+            "exists": true,
+            "size_bytes": 3104952
+          }
+        ]
+      },
+      "input_shape": [
+        1,
+        36,
+        36,
+        3
+      ],
+      "bvp_shape": [
+        1
+      ],
+      "bvp_mean": -1.2716517448425293,
+      "bvp_std": 0.0,
+      "finite": true,
+      "load_seconds": 20.658,
+      "inference_seconds": 0.064
+    },
+    {
+      "model": "me_chunk_rlap",
+      "display_name": "ME-chunk.rlap",
+      "backend_model": "ME-chunk.rlap",
+      "status": "ok",
+      "asset_check": {
+        "model": "me_chunk_rlap",
+        "ok": true,
+        "files": [
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\ME.rlap.weights.h5",
+            "exists": true,
+            "size_bytes": 2362992
+          },
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\state.pkl",
+            "exists": true,
+            "size_bytes": 1633574
+          }
+        ]
+      },
+      "input_shape": [
+        160,
+        36,
+        36,
+        3
+      ],
+      "bvp_shape": [
+        160
+      ],
+      "bvp_mean": 0.013406753540039062,
+      "bvp_std": 0.5748427510261536,
+      "finite": true,
+      "load_seconds": 3.687,
+      "inference_seconds": 1.167
+    },
+    {
+      "model": "rhythmmamba_rlap",
+      "display_name": "RhythmMamba.rlap",
+      "backend_model": "RhythmMamba.rlap",
+      "status": "ok",
+      "asset_check": {
+        "model": "rhythmmamba_rlap",
+        "ok": true,
+        "files": [
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\RhythmMamba.rlap.weights.h5",
+            "exists": true,
+            "size_bytes": 11643432
+          }
+        ]
+      },
+      "input_shape": [
+        160,
+        128,
+        128,
+        3
+      ],
+      "bvp_shape": [
+        160
+      ],
+      "bvp_mean": -1.2063979738741182e-05,
+      "bvp_std": 1.0001522302627563,
+      "finite": true,
+      "load_seconds": 24.326,
+      "inference_seconds": 1.747
+    },
+    {
+      "model": "physmamba_rlap",
+      "display_name": "PhysMamba.rlap",
+      "backend_model": "PhysMamba.rlap",
+      "status": "ok",
+      "asset_check": {
+        "model": "physmamba_rlap",
+        "ok": true,
+        "files": [
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\PhysMamba.rlap.weights.h5",
+            "exists": true,
+            "size_bytes": 3578800
+          }
+        ]
+      },
+      "input_shape": [
+        128,
+        128,
+        128,
+        3
+      ],
+      "bvp_shape": [
+        128
+      ],
+      "bvp_mean": -4.89354133605957e-05,
+      "bvp_std": 0.9998946189880371,
+      "finite": true,
+      "load_seconds": 39.403,
+      "inference_seconds": 8.115
+    },
+    {
+      "model": "efficientphys_rlap",
+      "display_name": "EfficientPhys.rlap",
+      "backend_model": "EfficientPhys.rlap",
+      "status": "ok",
+      "asset_check": {
+        "model": "efficientphys_rlap",
+        "ok": true,
+        "files": [
+          {
+            "path": "C:\\Users\\Bluesky\\Desktop\\test1\\open-rppg\\rppg\\weights\\EfficientPhys.rlap.weights.h5",
+            "exists": true,
+            "size_bytes": 4422640
+          }
+        ]
+      },
+      "input_shape": [
+        160,
+        72,
+        72,
+        3
+      ],
+      "bvp_shape": [
+        160
+      ],
+      "bvp_mean": 0.010017013177275658,
+      "bvp_std": 0.17488889396190643,
+      "finite": true,
+      "load_seconds": 9.844,
+      "inference_seconds": 1.713
+    }
+  ]
+}

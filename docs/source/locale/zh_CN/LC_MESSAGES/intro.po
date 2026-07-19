@@ -1,0 +1,347 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Kegang Wang
+# This file is distributed under the same license as the Open-rppg package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Open-rppg \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-01 21:23+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/intro.md:1
+msgid "Open-rppg"
+msgstr ""
+
+#: ../../source/intro.md:3
+msgid ""
+"Open-rppg is a comprehensive Python toolbox designed for Remote "
+"Photoplethysmography (rPPG) inference. It provides a unified interface "
+"for state-of-the-art deep learning models, enabling physiological signal "
+"measurement (such as heart rate and heart rate variability) from facial "
+"videos. The toolkit supports both offline video processing and low-"
+"latency real-time inference using JAX and Keras."
+msgstr ""
+
+#: ../../source/intro.md:5
+msgid "Installation"
+msgstr ""
+
+#: ../../source/intro.md:7
+msgid "This package requires Python 3.9 through 3.13."
+msgstr ""
+
+#: ../../source/intro.md:9
+msgid "To install the standard version:"
+msgstr ""
+
+#: ../../source/intro.md:15
+msgid ""
+"To enable GPU acceleration (Linux/CUDA), install the CUDA-supported "
+"version of JAX:"
+msgstr ""
+
+#: ../../source/intro.md:21
+msgid "Quick Start"
+msgstr ""
+
+#: ../../source/intro.md:23
+msgid ""
+"The core interface is managed through the `Model` class. By default, it "
+"initializes a robust, general-purpose model (`FacePhys.rlap`)."
+msgstr ""
+
+#: ../../source/intro.md:38
+msgid "Usage Guide"
+msgstr ""
+
+#: ../../source/intro.md:40
+msgid "1. Offline Video Processing"
+msgstr ""
+
+#: ../../source/intro.md:41
+msgid ""
+"To analyze a pre-recorded video file, use the `process_video` method. "
+"This method handles frame extraction, face detection, and signal "
+"inference automatically."
+msgstr ""
+
+#: ../../source/intro.md:47
+msgid "**Output Structure:** The returned dictionary contains the following keys:"
+msgstr ""
+
+#: ../../source/intro.md:50
+msgid "**hr**: Heart Rate estimated via the frequency domain (FFT)."
+msgstr ""
+
+#: ../../source/intro.md:51
+msgid ""
+"**SQI**: Signal Quality Index (0.0 to 1.0), indicating the reliability of"
+" the measurement."
+msgstr ""
+
+#: ../../source/intro.md:52
+msgid "**latency**: Inference latency (primarily relevant for real-time streams)."
+msgstr ""
+
+#: ../../source/intro.md:53
+msgid ""
+"**hrv**: A dictionary of Heart Rate Variability metrics calculated in the"
+" time domain:"
+msgstr ""
+
+#: ../../source/intro.md:54
+msgid "*bpm*: Heart rate derived from peak detection."
+msgstr ""
+
+#: ../../source/intro.md:55
+msgid "*ibi*: Inter-Beat Interval (milliseconds)."
+msgstr ""
+
+#: ../../source/intro.md:56
+msgid "*sdnn*: Standard deviation of NN intervals."
+msgstr ""
+
+#: ../../source/intro.md:57
+msgid "*rmssd*: Root mean square of successive differences."
+msgstr ""
+
+#: ../../source/intro.md:58
+msgid "*pnn50*: Proportion of NN50 > 50ms."
+msgstr ""
+
+#: ../../source/intro.md:59
+msgid "*LF/HF*: Ratio of Low Frequency to High Frequency power."
+msgstr ""
+
+#: ../../source/intro.md:60
+msgid "*breathingrate*: Estimated respiration rate."
+msgstr ""
+
+#: ../../source/intro.md:62
+msgid "2. Real-Time Inference"
+msgstr ""
+
+#: ../../source/intro.md:63
+msgid ""
+"Open-rppg includes a threaded pipeline optimized for real-time webcam "
+"inference. Use the `video_capture` context manager to handle the video "
+"stream safely."
+msgstr ""
+
+#: ../../source/intro.md:107
+msgid "Advanced API"
+msgstr ""
+
+#: ../../source/intro.md:109
+msgid "Retrieving Raw Signals"
+msgstr ""
+
+#: ../../source/intro.md:110
+msgid ""
+"You can extract the underlying Blood Volume Pulse (BVP) waveform for "
+"further analysis or plotting."
+msgstr ""
+
+#: ../../source/intro.md:120
+msgid "Time Slicing"
+msgstr ""
+
+#: ../../source/intro.md:121
+msgid "The toolbox allows specific time windows to be analyzed within the buffer."
+msgstr ""
+
+#: ../../source/intro.md:131
+msgid "Tensor Inputs"
+msgstr ""
+
+#: ../../source/intro.md:132
+msgid ""
+"For integration into existing pipelines where frames are already loaded "
+"as memory arrays, use the tensor processing methods."
+msgstr ""
+
+#: ../../source/intro.md:134
+msgid "**Input Format:** `uint8` array with shape `(Frames, Height, Width, 3)`."
+msgstr ""
+
+#: ../../source/intro.md:150
+msgid "Model Selection"
+msgstr ""
+
+#: ../../source/intro.md:151
+msgid ""
+"You can specify different architectures during initialization. The models"
+" are categorized by architecture and training configuration (`rlap` or "
+"`pure`)."
+msgstr ""
+
+#: ../../source/intro.md:158
+msgid "Model Zoo"
+msgstr ""
+
+#: ../../source/intro.md:160
+msgid "The following architectures are supported."
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Model Name"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Description"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Reference"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**ME-chunk**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "State-space model rPPG (chunk inference)"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "arXiv 2025"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**ME-flow**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "State-space model rPPG (low-latency flow)"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**PhysMamba**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Dual-branch Mamba architecture"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "CCBR 2024"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**RhythmMamba**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Frequency-domain constrained Mamba"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "AAAI 2025"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**PhysFormer**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Temporal Difference Transformer"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "CVPR 2022"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**TSCAN**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Temporal Shift Convolutional Attention Network"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "NeurIPS 2020"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**EfficientPhys**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Self-attention variant of TSCAN"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "WACV 2023"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**PhysNet**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "3D Convolutional Encoder-Decoder"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "BMVC 2019"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "**FacePhys**"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "Optimized state-space model"
+msgstr ""
+
+#: ../../source/intro.md
+msgid "-"
+msgstr ""
+
+#: ../../source/intro.md:174
+msgid ""
+"*Note: Suffixes `.rlap` and `.pure` indicate different training "
+"protocols/weights.*"
+msgstr ""
+
+#: ../../source/intro.md:176
+msgid "Licensing"
+msgstr ""
+
+#: ../../source/intro.md:178
+msgid ""
+"The source code and tools in this repository are released under the **MIT"
+" License**."
+msgstr ""
+
+#: ../../source/intro.md:180
+msgid ""
+"**Important:** Pretrained models and model configurations provided in "
+"this repository are derived from academic research. They are the "
+"intellectual property of their respective authors and are subject to the "
+"license terms specified in their original publications. Please refer to "
+"the citations below for details."
+msgstr ""
+
+#: ../../source/intro.md:182
+msgid "Citation"
+msgstr ""
+
+#: ../../source/intro.md:184
+msgid ""
+"If you use this toolkit or the included models in your research, please "
+"cite the relevant papers:"
+msgstr ""
+

@@ -1,0 +1,8 @@
+插件
+
+cd C:\Users\Bluesky\Desktop\test1\open-rppg
+.\.venv\Scripts\python.exe demo\browser_video_heart_server.py
+
+网页
+cd C:\Users\Bluesky\Desktop\test1\open-rppg
+.\.venv\Scripts\python.exe demo\live-heart-light-plugin\model_server.py

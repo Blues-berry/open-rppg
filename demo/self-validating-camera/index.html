@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>可信生命信号相机 Demo</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23101416'/%3E%3Cpath d='M8 17c3-8 13-8 16 0' fill='none' stroke='%2356c78f' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='17' r='4' fill='%235ab0ff'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Self-Validating rPPG Camera</p>
+          <h1>可信生命信号相机</h1>
+          <p class="subtitle">先证明采集可信，再输出安全证据。不可测时，系统必须敢于拒绝给出结论。</p>
+        </div>
+        <div class="header-status">
+          <span id="cameraMode" class="status-pill muted">未启动</span>
+          <span id="trustState" class="status-pill locked">指标锁定</span>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="camera-panel" aria-label="可信相机预览">
+          <div class="panel-head">
+            <div>
+              <h2>采集现场</h2>
+              <p id="stageHint">启动摄像头，或直接进入模拟器。</p>
+            </div>
+            <div id="phaseLabel" class="phase-label">LOCKED</div>
+          </div>
+
+          <div class="visual-stage">
+            <video id="cameraFeed" playsinline muted autoplay></video>
+            <canvas id="previewCanvas" width="1280" height="720"></canvas>
+            <div id="challengeLight" class="challenge-light" aria-hidden="true"></div>
+          </div>
+
+          <div class="control-strip">
+            <button id="startCameraBtn" type="button">启动相机</button>
+            <button id="calibrateBtn" type="button" class="primary">运行可信校验</button>
+            <button id="lightBtn" type="button">模拟光照突变</button>
+            <button id="occlusionBtn" type="button">模拟遮挡</button>
+            <button id="riskBtn" type="button">模拟风险趋势</button>
+            <button id="resetBtn" type="button">重置</button>
+          </div>
+        </section>
+
+        <aside class="side-panel" aria-label="可信证书和风险状态">
+          <section class="certificate">
+            <div class="trust-ring" id="trustRing">
+              <span id="trustScore">0</span>
+              <small>可信度</small>
+            </div>
+            <div>
+              <h2>采集可信证书</h2>
+              <p id="certificateText">尚未建立可信证书，生理指标保持锁定。</p>
+              <dl class="certificate-meta">
+                <div>
+                  <dt>证书编号</dt>
+                  <dd id="certId">未生成</dd>
+                </div>
+                <div>
+                  <dt>当班基线</dt>
+                  <dd id="baselineText">等待校验</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+
+          <section class="risk-board">
+            <div class="panel-head compact">
+              <div>
+                <h2>安全事件</h2>
+                <p>只输出证据链，不做医疗诊断。</p>
+              </div>
+              <span id="riskLevel" class="risk-badge level-locked">LOCK</span>
+            </div>
+            <div class="risk-summary">
+              <strong id="riskTitle">等待可信校验</strong>
+              <span id="riskReason">当前不允许读取心率、HRV 或趋势状态。</span>
+            </div>
+            <ol id="eventLog" class="event-log"></ol>
+          </section>
+        </aside>
+
+        <section class="workflow-panel" aria-label="可信校验流程">
+          <div class="panel-head compact">
+            <div>
+              <h2>自证可信流程</h2>
+              <p>相机先检查自己，再允许业务系统使用结果。</p>
+            </div>
+          </div>
+          <ol class="steps">
+            <li id="step-device">
+              <span>01</span>
+              <strong>设备自检</strong>
+              <small>帧率、亮度、ROI、延迟</small>
+            </li>
+            <li id="step-liveness">
+              <span>02</span>
+              <strong>活体动作</strong>
+              <small>眨眼、张嘴、轻微转头</small>
+            </li>
+            <li id="step-color">
+              <span>03</span>
+              <strong>多色响应</strong>
+              <small>红、绿、蓝、白通道校验</small>
+            </li>
+            <li id="step-static">
+              <span>04</span>
+              <strong>静止采样</strong>
+              <small>BVP、SQI、稳定性窗口</small>
+            </li>
+            <li id="step-cert">
+              <span>05</span>
+              <strong>证书生成</strong>
+              <small>允许输出安全事件</small>
+            </li>
+          </ol>
+        </section>
+
+        <section class="metrics-panel" aria-label="实时质量指标">
+          <div class="panel-head compact">
+            <div>
+              <h2>质量门控</h2>
+              <p>任何一项跌破阈值，系统自动转入不可判定。</p>
+            </div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric">
+              <span>人脸 ROI</span>
+              <strong id="roiValue">0%</strong>
+              <meter id="roiMeter" min="0" max="100" value="0"></meter>
+            </div>
+            <div class="metric">
+              <span>光照稳定</span>
+              <strong id="lightingValue">0%</strong>
+              <meter id="lightingMeter" min="0" max="100" value="0"></meter>
+            </div>
+            <div class="metric">
+              <span>运动抑制</span>
+              <strong id="motionValue">0%</strong>
+              <meter id="motionMeter" min="0" max="100" value="0"></meter>
+            </div>
+            <div class="metric">
+              <span>颜色响应</span>
+              <strong id="colorValue">0%</strong>
+              <meter id="colorMeter" min="0" max="100" value="0"></meter>
+            </div>
+            <div class="metric">
+              <span>SQI</span>
+              <strong id="sqiValue">0%</strong>
+              <meter id="sqiMeter" min="0" max="100" value="0"></meter>
+            </div>
+            <div class="metric">
+              <span>心率输出</span>
+              <strong id="hrValue">LOCK</strong>
+              <meter id="hrMeter" min="45" max="130" value="45"></meter>
+            </div>
+          </div>
+        </section>
+
+        <section class="api-panel" aria-label="SDK 事件输出">
+          <div class="panel-head compact">
+            <div>
+              <h2>SDK 事件输出</h2>
+              <p>给 DMS、安监平台、工位系统使用的安全证据层。</p>
+            </div>
+          </div>
+          <pre id="apiOutput" aria-live="polite"></pre>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

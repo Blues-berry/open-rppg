@@ -1,0 +1,5 @@
+# Optional benchmark-only dependencies.
+# The live OBS demo does not require these packages.
+yt-dlp>=2025.6.30
+paddleocr>=2.7.0
+paddlepaddle>=2.6.0; platform_system == "Windows"

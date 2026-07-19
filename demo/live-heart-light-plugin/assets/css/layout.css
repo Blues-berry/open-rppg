@@ -1,0 +1,271 @@
+.runtime-banner {
+  margin-bottom: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+.runtime-banner[data-kind="warn"],
+.runtime-banner.warn {
+  border-color: rgba(245, 193, 91, 0.54);
+  background: rgba(245, 193, 91, 0.09);
+  color: #fff0c8;
+}
+
+.runtime-banner[data-kind="bad"],
+.runtime-banner.bad {
+  border-color: rgba(255, 107, 131, 0.56);
+  background: rgba(255, 107, 131, 0.09);
+  color: #ffe0e6;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 16px;
+  align-items: start;
+}
+
+.preview-column,
+.status-column {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.status-column {
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.camera-card,
+.heart-card,
+.agent-card,
+.perf-card,
+.light-card,
+.overlay-card,
+.upload-card,
+.highlight-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.card-head.compact {
+  padding: 12px 14px;
+}
+
+.card-head p,
+.light-card p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.paired-preview-panel {
+  background: var(--panel-3);
+}
+
+.preview-stream-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px;
+}
+
+.preview-stream-grid:has(#lightPreviewStream[hidden]) {
+  grid-template-columns: 1fr;
+}
+
+.preview-stream[hidden] {
+  display: none !important;
+}
+
+.preview-stream {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #090c0e;
+}
+
+.preview-stream-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.preview-stream-label span {
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.preview-stream-label small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.preview-strip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.preview-strip-head span {
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.preview-strip-head small {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.preview-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #07090b;
+}
+
+.paired-preview-stage {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.paired-preview-stage.disabled {
+  cursor: default;
+}
+
+#currentOutputPreview,
+#pairedLightPreview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.output-telemetry-panel {
+  border-top: 1px solid var(--line);
+  background: var(--panel-3);
+}
+
+.telemetry-head {
+  border-bottom-color: var(--line-soft);
+}
+
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 14px 10px;
+}
+
+.controls {
+  padding: 10px;
+  border-top: 1px solid var(--line);
+  background: var(--panel-3);
+}
+
+.controls button {
+  flex: 1 1 150px;
+}
+
+.heart-card {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 12px;
+}
+
+.heart-copy {
+  min-width: 0;
+}
+
+.heart-card h2 {
+  font-size: 0.96rem;
+  line-height: 1.25;
+}
+
+.heart-card p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.heart-orb {
+  --beat-ms: 900ms;
+  --heart-arc: 0deg;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #15191d 58%, transparent 59%),
+    conic-gradient(var(--rose) 0deg, #2b3237 0deg);
+  box-shadow:
+    inset 0 0 22px rgba(255, 255, 255, 0.05),
+    0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+.heart-orb.has-output {
+  box-shadow:
+    inset 0 0 22px rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(255, 107, 131, 0.24),
+    0 16px 38px rgba(255, 57, 91, 0.18);
+}
+
+.heart-orb.holding-output {
+  border-color: rgba(245, 193, 91, 0.52);
+}
+
+.heart-orb #bpmValue {
+  margin-top: 2px;
+  font-size: 2.1rem;
+  line-height: 1;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+}
+
+.heart-orb small {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
