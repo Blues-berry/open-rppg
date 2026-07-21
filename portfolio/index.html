@@ -6,7 +6,7 @@
     <meta name="description" content="Open-rPPG：隐私优先、完全在浏览器本地运行的人脸脉搏体验与直播工具箱。" />
     <meta name="theme-color" content="#08100f" />
     <title>Open-rPPG · Local Pulse Lab</title>
-    <link rel="stylesheet" href="styles.css?v=20260721-pulselab-v3" />
+    <link rel="stylesheet" href="styles.css?v=20260721-facephys-v1" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -34,13 +34,13 @@
           <div class="art-top"><span>LIVE / SIGNAL</span><span class="live-dot">● LOCAL</span></div>
           <div class="art-number">72<span>BPM</span></div>
           <svg viewBox="0 0 620 180" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100 L30 100 L45 91 L57 109 L72 96 L85 101 L102 98 L122 101 L140 97 L153 102 L170 92 L181 116 L192 43 L205 142 L220 86 L231 100 L255 101 L272 96 L290 102 L310 99 L330 100 L345 93 L357 110 L372 95 L386 102 L405 100 L424 96 L438 103 L454 91 L466 117 L478 46 L490 139 L507 86 L520 101 L550 100 L570 95 L590 103 L620 100" /></svg>
-          <div class="art-bottom"><div><small>SIGNAL QUALITY</small><b>0.82</b></div><div><small>WINDOW</small><b>12.0 S</b></div><div><small>ENGINE</small><b>POS + ROI</b></div></div>
+          <div class="art-bottom"><div><small>SIGNAL QUALITY</small><b>0.82</b></div><div><small>WINDOW</small><b>15.0 S</b></div><div><small>ENGINE</small><b>FACEPHYS</b></div></div>
         </div>
       </section>
 
       <section class="metrics container" aria-label="项目能力">
         <div><b>01</b><span>浏览器本地<br />人脸 ROI 跟踪</span></div>
-        <div><b>02</b><span>POS rPPG 与<br />质量门控</span></div>
+        <div><b>02</b><span>FacePhys 与<br />质量门控</span></div>
         <div><b>03</b><span>OBS 画面源与<br />透明 Overlay</span></div>
         <div><b>04</b><span>零视频上传<br />隐私优先</span></div>
       </section>
@@ -115,6 +115,6 @@
       <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAMERA<small>视频帧</small></div><i>→</i><div>OPEN-RPPG<small>HR / SQI</small></div><i>→</i><div>OVERLAY<small>OBS / WEB</small></div></div><p>作品集站部署在 Vercel；完整模型、摄像头与密钥始终保留在本机，便于演示也保护隐私。</p></div></section>
     </main>
     <footer class="container"><a class="brand" href="#top"><span class="brand-mark">∿</span>OPEN-RPPG</a><span>REMOTE PHOTOPLETHYSMOGRAPHY · LOCAL-FIRST</span><a href="#top">回到顶部 ↑</a></footer>
-    <script type="module" src="app.js?v=20260721-pulselab-v3"></script>
+    <script type="module" src="app.js?v=20260721-facephys-v1"></script>
   </body>
 </html>
