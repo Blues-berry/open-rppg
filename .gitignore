@@ -21,7 +21,6 @@ htmlcov/
 .worktrees/
 .vscode/
 .idea/
-portfolio/
 
 # Local/generated demo media and benchmark outputs
 _github_upload/
