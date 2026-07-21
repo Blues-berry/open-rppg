@@ -1,6 +1,7 @@
-import { FaceTracker } from "./modules/face-tracker.js?v=20260721-pulselab-v2";
-import { SignalProcessor } from "./modules/signal-processor.js?v=20260721-pulselab-v2";
-import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260721-pulselab-v2";
+import { FaceTracker } from "./modules/face-tracker.js?v=20260721-pulselab-v3";
+import { SignalProcessor } from "./modules/signal-processor.js?v=20260721-pulselab-v3";
+import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260721-pulselab-v3";
+import { QUALITY_GATES, evaluateGate, qualityLevel } from "./modules/quality-gate.js?v=20260721-pulselab-v3";
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -22,7 +23,7 @@ function emptyMetrics() { return { face: 0, light: 0, motion: 0, signal: 0, sqi:
 function clamp(value, min = 0, max = 1) { return Math.min(max, Math.max(min, Number.isFinite(value) ? value : min)); }
 function percent(value) { return `${Math.round(clamp(value) * 100)}%`; }
 function setPhase(phase, status, hint) { state.phase = phase; ui.lab.dataset.phase = phase; ui.phase.textContent = status; ui.status.textContent = status; ui.hint.textContent = hint; }
-function setChecklist(name, active) { const item = ui.checklist.querySelector(`[data-check="${name}"]`); if (item) item.classList.toggle("is-pass", Boolean(active)); }
+function setChecklist(name, active) { const item = ui.checklist.querySelector(`[data-check="${name}"]`); if (!item) return; item.classList.toggle("is-pass", Boolean(active)); item.setAttribute("aria-checked", String(Boolean(active))); const icon = item.querySelector("i"); if (icon) icon.textContent = active ? "✓" : "○"; }
 function resetChecklist() { ["face", "light", "motion", "signal"].forEach((key) => setChecklist(key, false)); }
 
 async function start() {
@@ -167,7 +168,7 @@ function ingestSample(now, color) {
   const face = state.face.faceQuality;
   state.processor.push({ t: now, ...color });
   state.metrics = { ...state.metrics, brightness, light, motion, face, samples: state.processor.count, duration: state.processor.durationSeconds };
-  ui.faceStatus.textContent = "FACE: LOCKED"; ui.roiStatus.textContent = "ROI: 3 ZONES"; setChecklist("face", true); setChecklist("light", light >= 0.55); setChecklist("motion", motion >= 0.55);
+  ui.faceStatus.textContent = "FACE: LOCKED"; ui.roiStatus.textContent = "ROI: 3 ZONES"; setChecklist("face", face >= QUALITY_GATES.face); setChecklist("light", light >= QUALITY_GATES.light); setChecklist("motion", motion >= QUALITY_GATES.motion);
 }
 
 function analyze() {
@@ -178,25 +179,24 @@ function analyze() {
   ui.window.textContent = `${Math.min(result.duration, WARMUP_SECONDS).toFixed(1)} / ${WARMUP_SECONDS.toFixed(1)} s`;
   ui.calibrationBar.style.width = percent(readiness);
   ui.calibrationLabel.textContent = result.duration < WARMUP_SECONDS ? "建立稳定色彩窗口" : "采样窗口已建立";
-  ui.waveState.textContent = result.duration < WARMUP_SECONDS ? "正在累积样本" : result.signalQuality >= 0.45 ? "信号已滤波" : "信号质量不足";
+  const gate = evaluateGate(metrics, result, WARMUP_SECONDS);
+  ui.waveState.textContent = result.duration < WARMUP_SECONDS ? "正在累积样本" : gate.code === "signal" ? "频谱质量不足" : gate.accepted ? "信号已滤波" : `等待${gate.title}`;
   ui.peak.textContent = result.bpm ? `${Math.round(result.bpm)} BPM` : "-- BPM";
   updateQuality(metrics); drawWaveform(ui.wave, result.waveform); drawSpectrum(ui.spectrum, result.spectrum, result.bpm);
-  const accepted = result.duration >= WARMUP_SECONDS && metrics.face >= 0.55 && metrics.light >= 0.55 && metrics.motion >= 0.55 && result.sqi >= 0.42;
-  setChecklist("signal", accepted);
-  if (accepted) {
+  setChecklist("face", metrics.face >= QUALITY_GATES.face); setChecklist("light", metrics.light >= QUALITY_GATES.light); setChecklist("motion", metrics.motion >= QUALITY_GATES.motion); setChecklist("signal", gate.accepted);
+  if (gate.accepted) {
     ui.bpm.textContent = Math.round(result.bpm); ui.sqi.textContent = result.sqi.toFixed(2); ui.sqiOrb.classList.add("is-live");
-    setPhase("live", "稳定监测", "已检测到稳定的本地色彩周期变化；请保持自然呼吸与相对静止。");
+    setPhase("live", gate.title, gate.hint);
   } else {
     ui.bpm.textContent = "--"; ui.sqi.textContent = result.sqi ? result.sqi.toFixed(2) : "--"; ui.sqiOrb.classList.remove("is-live");
-    const issue = metrics.light < 0.55 ? "光照需调整" : metrics.motion < 0.55 ? "请保持静止" : result.duration < WARMUP_SECONDS ? "建立信号中" : "信号质量不足";
-    const hint = metrics.light < 0.55 ? "避免逆光、过暗或明显过曝，让面部均匀受光。" : metrics.motion < 0.55 ? "请减少头部移动，保持正对镜头数秒。" : result.duration < WARMUP_SECONDS ? `正在累积色彩窗口，还需 ${Math.max(0, WARMUP_SECONDS - result.duration).toFixed(1)} 秒。` : "已暂停心率输出；请改善光照并保持脸部稳定。";
-    setPhase("calibrating", issue, hint);
+    if (gate.candidateBpm) ui.waveState.textContent = `候选峰值 ${Math.round(gate.candidateBpm)} BPM，等待条件达标`;
+    setPhase("calibrating", gate.title, gate.hint);
   }
 }
 
 function updateQuality(metrics) {
   const items = [[ui.faceQuality, ui.faceBar, metrics.face], [ui.lightQuality, ui.lightBar, metrics.light], [ui.motionQuality, ui.motionBar, metrics.motion], [ui.signalQuality, ui.signalBar, metrics.signal]];
-  items.forEach(([value, bar, score]) => { value.textContent = score ? percent(score) : "--"; bar.style.width = percent(score); });
+  items.forEach(([value, bar, score]) => { value.textContent = score ? percent(score) : "--"; bar.style.width = percent(score); bar.closest(".quality-card").dataset.level = qualityLevel(score); });
 }
 
 function handleVisibility() { if (document.hidden && state.running) { setPhase("paused", "采集已暂停", "页面进入后台后已暂停采样；返回此页后请重新开始。 "); stop(); } }

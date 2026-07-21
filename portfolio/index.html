@@ -6,7 +6,7 @@
     <meta name="description" content="Open-rPPG：隐私优先、完全在浏览器本地运行的人脸脉搏体验与直播工具箱。" />
     <meta name="theme-color" content="#08100f" />
     <title>Open-rPPG · Local Pulse Lab</title>
-    <link rel="stylesheet" href="styles.css?v=20260721-pulselab-v2" />
+    <link rel="stylesheet" href="styles.css?v=20260721-pulselab-v3" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -85,7 +85,7 @@
               </div>
 
               <div class="quality-grid" aria-label="采样质量">
-                <div class="quality-card"><div><span>人脸追踪</span><b id="faceQualityValue">--</b></div><i><em id="faceQualityBar"></em></i></div>
+                <div class="quality-card"><div><span>ROI 可用性</span><b id="faceQualityValue">--</b></div><i><em id="faceQualityBar"></em></i></div>
                 <div class="quality-card"><div><span>环境光照</span><b id="lightQualityValue">--</b></div><i><em id="lightQualityBar"></em></i></div>
                 <div class="quality-card"><div><span>静止程度</span><b id="motionQualityValue">--</b></div><i><em id="motionQualityBar"></em></i></div>
                 <div class="quality-card"><div><span>色彩信号</span><b id="signalQualityValue">--</b></div><i><em id="signalQualityBar"></em></i></div>
@@ -97,7 +97,7 @@
           <section class="signal-deck" aria-label="脉搏信号分析">
             <div class="signal-card waveform-card"><div class="signal-head"><div><p class="micro-label">BVP WAVEFORM</p><span>处理后局部血容量脉搏信号</span></div><span id="waveState">等待有效 ROI</span></div><canvas id="waveCanvas" aria-label="实时 BVP 波形"></canvas></div>
             <div class="signal-card spectrum-card"><div class="signal-head"><div><p class="micro-label">FREQUENCY PEAK</p><span>42–180 BPM 有效区间</span></div><b id="peakValue">-- BPM</b></div><canvas id="spectrumCanvas" aria-label="脉搏频谱"></canvas></div>
-            <div class="signal-card health-card"><p class="micro-label">CAPTURE CHECK</p><ul id="captureChecklist"><li data-check="face">○ 人脸进入取景框</li><li data-check="light">○ 光线处于可采样范围</li><li data-check="motion">○ 保持相对静止</li><li data-check="signal">○ 建立有效色彩窗口</li></ul><p>演示结果受摄像头、肤色、光线和动作影响，请勿作为医疗结论。</p></div>
+            <div class="signal-card health-card"><p class="micro-label">CAPTURE CHECK</p><ul id="captureChecklist"><li data-check="face"><i aria-hidden="true">○</i><span>人脸 ROI 可用</span></li><li data-check="light"><i aria-hidden="true">○</i><span>光线处于可采样范围</span></li><li data-check="motion"><i aria-hidden="true">○</i><span>保持相对静止</span></li><li data-check="signal"><i aria-hidden="true">○</i><span>建立有效色彩窗口</span></li></ul><p>演示结果受摄像头、肤色、光线和动作影响，请勿作为医疗结论。</p></div>
           </section>
         </div>
       </section>
@@ -115,6 +115,6 @@
       <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAMERA<small>视频帧</small></div><i>→</i><div>OPEN-RPPG<small>HR / SQI</small></div><i>→</i><div>OVERLAY<small>OBS / WEB</small></div></div><p>作品集站部署在 Vercel；完整模型、摄像头与密钥始终保留在本机，便于演示也保护隐私。</p></div></section>
     </main>
     <footer class="container"><a class="brand" href="#top"><span class="brand-mark">∿</span>OPEN-RPPG</a><span>REMOTE PHOTOPLETHYSMOGRAPHY · LOCAL-FIRST</span><a href="#top">回到顶部 ↑</a></footer>
-    <script type="module" src="app.js?v=20260721-pulselab-v2"></script>
+    <script type="module" src="app.js?v=20260721-pulselab-v3"></script>
   </body>
 </html>

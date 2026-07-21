@@ -28,7 +28,10 @@ export class FaceTracker {
     const center = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
     const movement = this.previous ? Math.hypot(center.x - this.previous.x, center.y - this.previous.y) / Math.max(bounds.width, bounds.height) : 0;
     this.previous = center;
-    const faceQuality = Math.min(1, (bounds.width * bounds.height) / 0.2) * clamp(1 - yaw / 0.32) * (center.x > 0.08 && center.x < 0.92 && center.y > 0.06 && center.y < 0.94 ? 1 : 0.55);
+    const areaScore = clamp((bounds.width * bounds.height) / 0.1);
+    const poseScore = 0.75 + 0.25 * clamp(1 - yaw / 0.32);
+    const positionScore = center.x > 0.08 && center.x < 0.92 && center.y > 0.06 && center.y < 0.94 ? 1 : 0.55;
+    const faceQuality = areaScore * poseScore * positionScore;
     const detected = { valid: true, landmarks, outline: FACE_OVAL.map((index) => landmarks[index]), bounds, rois: buildRois(bounds), motionQuality: clamp(1 - movement * 4.8), faceQuality: clamp(faceQuality), yaw };
     this.lastValid = detected; this.lastValidAt = timestamp;
     return detected;
