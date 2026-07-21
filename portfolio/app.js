@@ -1,6 +1,6 @@
-import { FaceTracker } from "./modules/face-tracker.js?v=20260721-pulselab-v1";
-import { SignalProcessor } from "./modules/signal-processor.js?v=20260721-pulselab-v1";
-import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260721-pulselab-v1";
+import { FaceTracker } from "./modules/face-tracker.js?v=20260721-pulselab-v2";
+import { SignalProcessor } from "./modules/signal-processor.js?v=20260721-pulselab-v2";
+import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260721-pulselab-v2";
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -26,7 +26,7 @@ function setChecklist(name, active) { const item = ui.checklist.querySelector(`[
 function resetChecklist() { ["face", "light", "motion", "signal"].forEach((key) => setChecklist(key, false)); }
 
 async function start() {
-  if (state.running) return stop();
+  if (state.running || state.stream) return stop();
   if (!navigator.mediaDevices?.getUserMedia) return fail("当前浏览器不支持摄像头访问", "请使用最新版 Chrome 或 Edge 打开此页面。");
   resetSession();
   try {
@@ -47,8 +47,10 @@ async function start() {
     setPhase("searching", "搜索人脸", "请将一张脸置于取景框中央，保持正对镜头。");
     nextFrame();
   } catch (error) {
-    const message = error?.name === "NotAllowedError" ? "请在浏览器地址栏的站点权限中允许摄像头，然后重试。" : "未能初始化本地摄像头或人脸模型，请检查设备与网络缓存后重试。";
-    fail("无法开启本地采集", message);
+    const cameraIsVisible = Boolean(state.stream && ui.camera.videoWidth);
+    if (error?.name === "NotAllowedError") fail("未获得摄像头权限", "请在浏览器地址栏的站点权限中允许摄像头，然后重试。");
+    else if (cameraIsVisible) fail("人脸模型未加载", "摄像头已成功开启；但本地人脸模型未能初始化。请刷新页面，确认 Vercel 已部署 assets 资源后重试。", { keepCamera: true });
+    else fail("无法开启本地采集", "请确认设备存在可用摄像头，并使用 HTTPS 的 Chrome 或 Edge 页面访问。");
   } finally { ui.start.disabled = false; }
 }
 
@@ -76,12 +78,16 @@ function resetSession() {
   updateQuality(emptyMetrics()); drawFaceOverlay(ui.overlay, ui.camera, null); drawWaveform(ui.wave, []); drawSpectrum(ui.spectrum, []); resetChecklist();
 }
 
-function fail(status, hint) {
+function fail(status, hint, { keepCamera = false } = {}) {
   state.running = false;
-  state.stream?.getTracks().forEach((track) => track.stop());
-  state.stream = null;
+  if (state.frameRequest) cancelAnimationFrame(state.frameRequest);
+  state.frameRequest = null;
   state.tracker?.close(); state.tracker = null;
-  ui.camera.srcObject = null; ui.empty.hidden = false; ui.start.textContent = "重新尝试 →"; ui.start.classList.remove("stop"); ui.cameraStatus.textContent = "CAMERA ERROR";
+  if (keepCamera) {
+    ui.empty.hidden = true; ui.guide.hidden = false; ui.start.textContent = "停止摄像头 ×"; ui.start.classList.add("stop"); ui.cameraStatus.textContent = "CAMERA LIVE"; ui.faceStatus.textContent = "FACE: MODEL ERROR"; ui.roiStatus.textContent = "ROI: PAUSED";
+  } else {
+    state.stream?.getTracks().forEach((track) => track.stop()); state.stream = null; ui.camera.srcObject = null; ui.empty.hidden = false; ui.start.textContent = "重新尝试 →"; ui.start.classList.remove("stop"); ui.cameraStatus.textContent = "CAMERA ERROR";
+  }
   setPhase("error", status, hint);
 }
 
@@ -194,7 +200,7 @@ function updateQuality(metrics) {
 }
 
 function handleVisibility() { if (document.hidden && state.running) { setPhase("paused", "采集已暂停", "页面进入后台后已暂停采样；返回此页后请重新开始。 "); stop(); } }
-ui.start.addEventListener("click", start);
+ui.start.addEventListener("click", () => state.stream ? stop() : start());
 window.addEventListener("resize", () => { drawFaceOverlay(ui.overlay, ui.camera, state.face); });
 window.addEventListener("beforeunload", stop);
 document.addEventListener("visibilitychange", handleVisibility);
