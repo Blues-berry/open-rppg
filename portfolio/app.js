@@ -1,6 +1,6 @@
 import { FaceTracker } from "./modules/face-tracker.js?v=20260721-facephys-v1";
 import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260722-facephys-v3";
-import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260721-facephys-v1";
+import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260722-design-v4";
 import { QUALITY_GATES, evaluateGate, qualityLevel } from "./modules/quality-gate.js?v=20260721-facephys-v1";
 
 const $ = (id) => document.getElementById(id);
@@ -27,23 +27,23 @@ function resetChecklist() { ["face", "light", "motion", "signal"].forEach((key) 
 
 async function start() {
   if (state.running || state.stream) return stop();
-  if (!navigator.mediaDevices?.getUserMedia) return fail("当前浏览器不支持摄像头访问", "请使用最新版 Chrome 或 Edge 打开此页面。");
+  if (!navigator.mediaDevices?.getUserMedia) return fail("无法使用摄像头", "请使用最新版 Chrome 或 Edge，并确认浏览器支持摄像头访问。");
   resetSession();
   try {
-    setPhase("permission", "请求摄像头权限", "请在浏览器提示中允许使用前置摄像头。"); ui.start.disabled = true;
+    setPhase("permission", "等待摄像头授权", "请在浏览器提示中允许访问摄像头，画面仅在当前设备处理。"); ui.start.disabled = true;
     state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, min: 20 } }, audio: false });
     ui.camera.srcObject = state.stream; await ui.camera.play(); ui.empty.hidden = true; ui.guide.hidden = false; ui.cameraStatus.textContent = "CAMERA LIVE";
-    setPhase("model", "加载本地 FacePhys", "正在加载本站点的 LiteRT 模型；视频和生物数据不会离开设备。");
+    setPhase("model", "正在准备本地模型", "FacePhys 与 LiteRT 正在设备上初始化，请稍候。");
     state.tracker = await FaceTracker.create();
     state.engine = new FacePhysEngine(onFacePhysResult, onFacePhysError);
     await state.engine.initialize();
     state.running = true; ui.start.textContent = "停止采集 ×"; ui.start.classList.add("stop"); ui.start.disabled = false;
-    setPhase("searching", "搜索人脸", "请将一张脸置于取景框中央，保持正对镜头。"); nextFrame();
+    setPhase("searching", "正在寻找人脸", "请正对镜头并保持居中，让面部光线尽量均匀。"); nextFrame();
   } catch (error) {
     const cameraIsVisible = Boolean(state.stream && ui.camera.videoWidth);
-    if (error?.name === "NotAllowedError") fail("未获得摄像头权限", "请在浏览器地址栏的站点权限中允许摄像头，然后重试。");
-    else if (cameraIsVisible) fail("FacePhys 模型未加载", `摄像头已成功开启；但本地 FacePhys 初始化失败：${error?.message || "未知错误"}。请刷新页面，确认 Vercel 已部署全部模型资源后重试。`, { keepCamera: true });
-    else fail("无法开启本地采集", "请确认设备存在可用摄像头，并使用 HTTPS 的 Chrome 或 Edge 页面访问。");
+    if (error?.name === "NotAllowedError") fail("摄像头权限未开启", "请在地址栏的站点权限中允许摄像头，然后重新开始。");
+    else if (cameraIsVisible) fail("本地模型启动失败", modelErrorHint(error), { keepCamera: true });
+    else fail("摄像头启动失败", "请确认设备可用，并通过 HTTPS 的 Chrome 或 Edge 访问此页面。");
   } finally { ui.start.disabled = false; }
 }
 
@@ -52,7 +52,15 @@ function stop() {
   state.stream?.getTracks().forEach((track) => track.stop()); state.stream = null; ui.camera.srcObject = null;
   state.tracker?.close(); state.tracker = null; state.engine?.destroy(); state.engine = null; resetSession();
   ui.empty.hidden = false; ui.guide.hidden = false; ui.cameraStatus.textContent = "STANDBY"; ui.start.textContent = "开启摄像头 →"; ui.start.classList.remove("stop");
-  setPhase("idle", "等待启动", "允许摄像头后，本机将以 FacePhys 建立脉搏信号窗口。");
+  setPhase("idle", "等待开始", "开启摄像头后，FacePhys 将在本机建立脉搏信号窗口。");
+}
+
+function modelErrorHint(error) {
+  const message = error?.message || "";
+  if (/magic word|WebAssembly\.instantiate/i.test(message)) return "WASM 资源响应异常。请强制刷新页面，确认部署完成后重试。";
+  if (/模型资源加载失败|fetch|404/i.test(message)) return "模型资源未完整加载。请检查网络，或等待部署完成后重试。";
+  if (/初始化超时/i.test(message)) return "模型准备时间过长。请刷新页面，并关闭占用资源较高的其他标签页。";
+  return "FacePhys 未能在当前设备启动。请刷新页面，或更新浏览器后重试。";
 }
 
 function resetSession() {
@@ -86,7 +94,7 @@ function invalidateFace(reason) {
   state.engine?.reset(); state.result = emptyResult(); state.waveform = []; state.metrics = { ...emptyMetrics(), fps: state.metrics.fps }; state.lastEngineAt = 0;
   ui.bpm.textContent = "--"; ui.sqi.textContent = "--"; ui.sqiOrb.classList.remove("is-live"); ui.faceStatus.textContent = "FACE: LOST"; ui.roiStatus.textContent = "ROI: PAUSED"; ui.window.textContent = `0.0 / ${WARMUP_SECONDS.toFixed(1)} s`; ui.calibrationBar.style.width = "0%"; ui.calibrationLabel.textContent = "等待可用人脸"; ui.waveState.textContent = "采样已暂停"; ui.peak.textContent = "-- BPM";
   updateQuality(state.metrics); drawWaveform(ui.wave, []); drawSpectrum(ui.spectrum, []); setChecklist("face", false); setChecklist("signal", false);
-  const status = reason === "multiple" ? "检测到多张人脸" : "搜索人脸"; const hint = reason === "multiple" ? "请保持仅一人入镜，系统不会自动切换检测对象。" : reason === "small" ? "请靠近镜头，让脸部占据更多画面。" : reason === "pose" ? "请正对镜头，避免大幅侧脸或低头。" : "请将一张脸置于取景框中央，保持正对镜头。"; setPhase("searching", status, hint);
+  const status = reason === "multiple" ? "画面中人数过多" : "正在寻找人脸"; const hint = reason === "multiple" ? "请保持一人入镜，以免检测目标发生切换。" : reason === "small" ? "请稍微靠近镜头，让完整面部清晰可见。" : reason === "pose" ? "请正对镜头，减少侧脸、低头或遮挡。" : "请正对镜头并保持居中，让面部光线尽量均匀。"; setPhase("searching", status, hint);
 }
 
 function sampleFace(bounds) {
@@ -110,8 +118,8 @@ function onFacePhysError(error) { if (state.running) fail("FacePhys 推理异常
 
 function analyze() {
   const result = state.result, signal = result.sqi || 0, metrics = { ...state.metrics, signal, sqi: result.sqi || 0, samples: result.samples || 0, duration: result.duration || 0, peak: result.bpm || 0 }; state.metrics = metrics;
-  const readiness = clamp(metrics.duration / WARMUP_SECONDS); ui.window.textContent = `${Math.min(metrics.duration, WARMUP_SECONDS).toFixed(1)} / ${WARMUP_SECONDS.toFixed(1)} s`; ui.calibrationBar.style.width = percent(readiness); ui.calibrationLabel.textContent = metrics.duration < WARMUP_SECONDS ? "FacePhys 正在建立时序窗口" : "FacePhys 信号窗口已建立";
-  const gate = evaluateGate(metrics, result, WARMUP_SECONDS); ui.waveState.textContent = metrics.duration < WARMUP_SECONDS ? "正在累积 FacePhys 时序样本" : gate.code === "signal" ? "FacePhys 质量门控未通过" : gate.accepted ? "FacePhys 本地推理中" : `等待${gate.title}`; ui.peak.textContent = result.bpm ? `${Math.round(result.bpm)} BPM` : "-- BPM";
+  const readiness = clamp(metrics.duration / WARMUP_SECONDS); ui.window.textContent = `${Math.min(metrics.duration, WARMUP_SECONDS).toFixed(1)} / ${WARMUP_SECONDS.toFixed(1)} s`; ui.calibrationBar.style.width = percent(readiness); ui.calibrationLabel.textContent = metrics.duration < WARMUP_SECONDS ? "正在建立脉搏窗口" : "脉搏窗口已建立";
+  const gate = evaluateGate(metrics, result, WARMUP_SECONDS); ui.waveState.textContent = metrics.duration < WARMUP_SECONDS ? "正在积累时序信号" : gate.code === "signal" ? "信号质量暂未达标" : gate.accepted ? "本地推理稳定" : `等待${gate.title}`; ui.peak.textContent = result.bpm ? `${Math.round(result.bpm)} BPM` : "-- BPM";
   updateQuality(metrics); drawWaveform(ui.wave, state.waveform); drawSpectrum(ui.spectrum, result.spectrum, result.bpm); setChecklist("face", metrics.face >= QUALITY_GATES.face); setChecklist("light", metrics.light >= QUALITY_GATES.light); setChecklist("motion", metrics.motion >= QUALITY_GATES.motion); setChecklist("signal", gate.accepted);
   if (gate.accepted) { ui.bpm.textContent = Math.round(result.bpm); ui.sqi.textContent = result.sqi.toFixed(2); ui.sqiOrb.classList.add("is-live"); setPhase("live", gate.title, gate.hint); }
   else { ui.bpm.textContent = "--"; ui.sqi.textContent = result.sqi ? result.sqi.toFixed(2) : "--"; ui.sqiOrb.classList.remove("is-live"); if (gate.candidateBpm) ui.waveState.textContent = `候选峰值 ${Math.round(gate.candidateBpm)} BPM，等待条件达标`; setPhase("calibrating", gate.title, gate.hint); }

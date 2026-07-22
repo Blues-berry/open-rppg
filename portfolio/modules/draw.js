@@ -11,6 +11,17 @@ export function drawFaceOverlay(canvas, video, face) {
 
 export function drawWaveform(canvas, values) { const { ctx, width, height } = setup(canvas); grid(ctx, width, height); if (!values?.length) return; const max = Math.max(...values.map((v) => Math.abs(v)), 1); ctx.beginPath(); values.forEach((value, index) => { const x = (index / Math.max(1, values.length - 1)) * width, y = height / 2 - (value / max) * height * 0.34; index ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.strokeStyle = "#67f3c2"; ctx.lineWidth = 1.7; ctx.shadowColor = "#49e8b2"; ctx.shadowBlur = 7; ctx.stroke(); }
 export function drawSpectrum(canvas, points, bpm = 0) { const { ctx, width, height } = setup(canvas); grid(ctx, width, height); if (!points?.length) return; const max = Math.max(...points.map((p) => p.power), 1e-9); ctx.fillStyle = "rgba(103, 243, 194, .48)"; points.forEach((point, index) => { const x = (index / points.length) * width, barWidth = Math.max(1, width / points.length - 1), barHeight = (point.power / max) * (height - 14); ctx.fillRect(x, height - barHeight, barWidth, barHeight); }); if (bpm) { const x = ((bpm - 42) / 138) * width; ctx.strokeStyle = "#f3d56b"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); } }
-function setup(canvas) { const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1, width = Math.max(1, rect.width), height = Math.max(1, rect.height); canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr); const ctx = canvas.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height); return { ctx, width, height }; }
+function setup(canvas) {
+  const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const width = Math.max(1, rect.width), height = Math.max(1, rect.height);
+  const pixelWidth = Math.round(width * dpr), pixelHeight = Math.round(height * dpr);
+  // Reassigning canvas.width/height clears the backing store. The spectrum is
+  // refreshed frequently, so resizing it on every frame caused visible flashes.
+  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+    canvas.width = pixelWidth; canvas.height = pixelHeight;
+  }
+  const ctx = canvas.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height);
+  return { ctx, width, height };
+}
 function grid(ctx, width, height) { ctx.strokeStyle = "rgba(175, 255, 225, .08)"; ctx.lineWidth = 1; for (let i = 1; i < 4; i += 1) { const y = (height / 4) * i; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); } }
 function path(ctx, points) { ctx.beginPath(); points.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y)); ctx.closePath(); }

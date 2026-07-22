@@ -3,35 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Open-rPPG：隐私优先、完全在浏览器本地运行的人脸脉搏体验与直播工具箱。" />
+    <meta name="description" content="Open-rPPG：在浏览器本地完成 FacePhys 推理，让摄像头画面呈现实时脉搏与信号质量。" />
     <meta name="theme-color" content="#08100f" />
-    <title>Open-rPPG · Local Pulse Lab</title>
-    <link rel="stylesheet" href="styles.css?v=20260722-facephys-v3" />
+    <title>Open-rPPG · 看见画面中的脉搏</title>
+    <link rel="stylesheet" href="styles.css?v=20260722-design-v4" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
     <header class="nav container">
       <a class="brand" href="#top" aria-label="Open-rPPG 首页"><span class="brand-mark">∿</span>OPEN-RPPG</a>
       <nav aria-label="站内导航">
-        <a href="#experience">体验</a><a href="#system">系统</a><a href="#workflow">工作流</a>
+        <a href="#experience">在线体验</a><a href="#system">核心能力</a><a href="#workflow">运行方式</a>
       </nav>
-      <a class="nav-cta" href="#experience">开始体验 <span>↗</span></a>
+      <a class="nav-cta" href="#experience">立即体验 <span>↗</span></a>
     </header>
 
     <main id="top">
       <section class="hero container">
         <div class="hero-copy">
-          <p class="eyebrow"><span></span> LOCAL PULSE LAB · 2026</p>
-          <h1>看见视频里<br /><em>未被看见的脉搏。</em></h1>
-          <p class="lead">一个面向直播互动、视频分析与工程验证的 rPPG 工具箱。将普通摄像头画面转化为实时心率、信号质量和直播 Overlay。</p>
+          <p class="eyebrow"><span></span> LOCAL PULSE LAB · FACEPHYS</p>
+          <h1>让每一帧，<br /><em>显露脉搏。</em></h1>
+          <p class="lead">以普通摄像头捕捉面部微弱色彩变化，在本机完成 FacePhys 推理，让脉搏、信号质量与直播画面自然连接。</p>
           <div class="hero-actions">
-            <a class="button primary" href="#experience">在线体验 <span>↓</span></a>
-            <a class="button quiet" href="#system">查看系统 <span>→</span></a>
+            <a class="button primary" href="#experience">体验本地测量 <span>↓</span></a>
+            <a class="button quiet" href="#system">浏览核心能力 <span>→</span></a>
           </div>
-          <p class="disclaimer">仅用于体验展示与工程验证，不用于诊断、治疗或健康决策。</p>
+          <p class="disclaimer">工程演示 · 非医疗用途 · 所有处理均在本机完成</p>
         </div>
         <div class="hero-art" aria-label="实时信号可视化">
-          <div class="art-top"><span>LIVE / SIGNAL</span><span class="live-dot">● LOCAL</span></div>
+          <div class="art-top"><span>LIVE PULSE SIGNAL</span><span class="live-dot">● LOCAL ONLY</span></div>
           <div class="art-number">72<span>BPM</span></div>
           <svg viewBox="0 0 620 180" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100 L30 100 L45 91 L57 109 L72 96 L85 101 L102 98 L122 101 L140 97 L153 102 L170 92 L181 116 L192 43 L205 142 L220 86 L231 100 L255 101 L272 96 L290 102 L310 99 L330 100 L345 93 L357 110 L372 95 L386 102 L405 100 L424 96 L438 103 L454 91 L466 117 L478 46 L490 139 L507 86 L520 101 L550 100 L570 95 L590 103 L620 100" /></svg>
           <div class="art-bottom"><div><small>SIGNAL QUALITY</small><b>0.82</b></div><div><small>WINDOW</small><b>15.0 S</b></div><div><small>ENGINE</small><b>FACEPHYS</b></div></div>
@@ -39,19 +39,19 @@
       </section>
 
       <section class="metrics container" aria-label="项目能力">
-        <div><b>01</b><span>浏览器本地<br />人脸 ROI 跟踪</span></div>
-        <div><b>02</b><span>FacePhys 与<br />质量门控</span></div>
-        <div><b>03</b><span>OBS 画面源与<br />透明 Overlay</span></div>
-        <div><b>04</b><span>零视频上传<br />隐私优先</span></div>
+        <div><b>01</b><span>本地人脸<br />稳定追踪</span></div>
+        <div><b>02</b><span>FacePhys<br />时序推理</span></div>
+        <div><b>03</b><span>OBS 直播<br />即时呈现</span></div>
+        <div><b>04</b><span>隐私优先<br />零帧上传</span></div>
       </section>
 
       <section class="experience container" id="experience">
-        <div class="section-heading"><div><p class="eyebrow"><span></span> LOCAL INSTRUMENT</p><h2>浏览器内的<br />脉搏体验。</h2></div><p>允许摄像头后，视频、关键点和色彩信号始终只在本机内存中处理。先确认人脸与采样条件，再建立可视化的脉搏窗口。</p></div>
+        <div class="section-heading"><div><p class="eyebrow"><span></span> LOCAL PULSE INSTRUMENT</p><h2>镜头前，读懂<br />一段脉搏。</h2></div><p>允许摄像头后，系统会在本机追踪面部并评估采样条件。视频不上传，信号不留存，结果只为当下呈现。</p></div>
 
         <div class="pulse-lab" id="pulseLab" data-phase="idle">
           <div class="instrument-bar">
-            <div class="instrument-title"><span class="instrument-dot"></span><span>LOCAL PULSE INSTRUMENT</span><small id="phaseLabel">等待启动</small></div>
-            <div class="instrument-meta"><span id="fpsValue">-- FPS</span><span>·</span><span>NO UPLOAD</span><span class="privacy-lock">⌁</span></div>
+            <div class="instrument-title"><span class="instrument-dot"></span><span>LOCAL PULSE</span><small id="phaseLabel">等待启动</small></div>
+            <div class="instrument-meta"><span id="fpsValue">-- FPS</span><span>·</span><span>LOCAL ONLY</span><span class="privacy-lock">⌁</span></div>
           </div>
 
           <div class="instrument-grid">
@@ -60,61 +60,61 @@
               <canvas id="faceOverlay" aria-label="人脸检测与取样区域叠加层"></canvas>
               <canvas id="sampleCanvas" hidden></canvas>
               <div class="camera-empty" id="cameraEmpty">
-                <span class="camera-icon">◌</span><strong>CAMERA OFFLINE</strong><small>启动后可在这里看到本地摄像头与人脸取样区域</small>
+                <span class="camera-icon">◌</span><strong>摄像头未开启</strong><small>开始后，实时画面与人脸采样区域会显示在这里</small>
               </div>
               <div class="camera-hud top"><span class="hud-status" id="cameraStatus">STANDBY</span><span>FRONT CAMERA</span></div>
               <div class="camera-hud bottom"><span id="faceStatus">FACE: --</span><span id="roiStatus">ROI: --</span></div>
-              <div class="camera-guide" id="cameraGuide"><span></span><small>将脸部置于取景框中央</small></div>
+              <div class="camera-guide" id="cameraGuide"><span></span><small>面向镜头 · 保持居中</small></div>
             </section>
 
             <section class="instrument-readout" aria-live="polite">
               <div class="readout-header">
-                <div><p class="micro-label">SAMPLING STATE</p><strong id="statusChip" class="status-chip">等待开始</strong></div>
+                <div><p class="micro-label">CAPTURE STATUS</p><strong id="statusChip" class="status-chip">等待开始</strong></div>
                 <button class="start-button" id="startButton" type="button">开启摄像头 <span>→</span></button>
               </div>
-              <p class="instrument-hint" id="demoHint">允许摄像头后，本机将检测人脸并开始校准。</p>
+              <p class="instrument-hint" id="demoHint">允许摄像头后，系统将在本机完成人脸定位与信号校准。</p>
 
               <div class="bpm-readout">
-                <div><p class="micro-label">PULSE RATE</p><div class="bpm"><strong id="bpmValue">--</strong><span>BPM</span></div></div>
+                <div><p class="micro-label">PULSE RATE · 脉率</p><div class="bpm"><strong id="bpmValue">--</strong><span>BPM</span></div></div>
                 <div class="sqi-orb" id="sqiOrb"><span>SQI</span><b id="qualityValue">--</b></div>
               </div>
 
               <div class="calibration-block">
-                <div class="calibration-head"><span id="calibrationLabel">等待采样窗口</span><b id="windowValue">0.0 / 12.0 s</b></div>
+                <div class="calibration-head"><span id="calibrationLabel">等待采样窗口</span><b id="windowValue">0.0 / 15.0 s</b></div>
                 <div class="calibration-track"><i id="calibrationBar"></i></div>
               </div>
 
               <div class="quality-grid" aria-label="采样质量">
                 <div class="quality-card"><div><span>ROI 可用性</span><b id="faceQualityValue">--</b></div><i><em id="faceQualityBar"></em></i></div>
                 <div class="quality-card"><div><span>环境光照</span><b id="lightQualityValue">--</b></div><i><em id="lightQualityBar"></em></i></div>
-                <div class="quality-card"><div><span>静止程度</span><b id="motionQualityValue">--</b></div><i><em id="motionQualityBar"></em></i></div>
-                <div class="quality-card"><div><span>色彩信号</span><b id="signalQualityValue">--</b></div><i><em id="signalQualityBar"></em></i></div>
+                <div class="quality-card"><div><span>画面稳定</span><b id="motionQualityValue">--</b></div><i><em id="motionQualityBar"></em></i></div>
+                <div class="quality-card"><div><span>脉搏信号</span><b id="signalQualityValue">--</b></div><i><em id="signalQualityBar"></em></i></div>
               </div>
-              <div class="instrument-note"><span class="privacy-lock">⌁</span><span>视频帧、关键点和波形不离开此设备</span></div>
+              <div class="instrument-note"><span class="privacy-lock">⌁</span><span>视频、关键点与波形仅存在于当前设备</span></div>
             </section>
           </div>
 
           <section class="signal-deck" aria-label="脉搏信号分析">
-            <div class="signal-card waveform-card"><div class="signal-head"><div><p class="micro-label">BVP WAVEFORM</p><span>处理后局部血容量脉搏信号</span></div><span id="waveState">等待有效 ROI</span></div><canvas id="waveCanvas" aria-label="实时 BVP 波形"></canvas></div>
-            <div class="signal-card spectrum-card"><div class="signal-head"><div><p class="micro-label">FREQUENCY PEAK</p><span>42–180 BPM 有效区间</span></div><b id="peakValue">-- BPM</b></div><canvas id="spectrumCanvas" aria-label="脉搏频谱"></canvas></div>
-            <div class="signal-card health-card"><p class="micro-label">CAPTURE CHECK</p><ul id="captureChecklist"><li data-check="face"><i aria-hidden="true">○</i><span>人脸 ROI 可用</span></li><li data-check="light"><i aria-hidden="true">○</i><span>光线处于可采样范围</span></li><li data-check="motion"><i aria-hidden="true">○</i><span>保持相对静止</span></li><li data-check="signal"><i aria-hidden="true">○</i><span>建立有效色彩窗口</span></li></ul><p>演示结果受摄像头、肤色、光线和动作影响，请勿作为医疗结论。</p></div>
+            <div class="signal-card waveform-card"><div class="signal-head"><div><p class="micro-label">PULSE WAVE · BVP</p><span>FacePhys 输出的实时脉搏波形</span></div><span id="waveState">等待有效 ROI</span></div><canvas id="waveCanvas" aria-label="实时 BVP 波形"></canvas></div>
+            <div class="signal-card spectrum-card"><div class="signal-head"><div><p class="micro-label">PULSE SPECTRUM</p><span>有效脉率范围 · 42–180 BPM</span></div><b id="peakValue">-- BPM</b></div><canvas id="spectrumCanvas" aria-label="脉搏频谱"></canvas></div>
+            <div class="signal-card health-card"><p class="micro-label">CAPTURE QUALITY</p><ul id="captureChecklist"><li data-check="face"><i aria-hidden="true">○</i><span>人脸区域清晰可用</span></li><li data-check="light"><i aria-hidden="true">○</i><span>面部光线均匀</span></li><li data-check="motion"><i aria-hidden="true">○</i><span>画面保持稳定</span></li><li data-check="signal"><i aria-hidden="true">○</i><span>脉搏窗口已建立</span></li></ul><p>结果会受设备、光线与动作影响，仅用于交互演示。</p></div>
           </section>
         </div>
       </section>
 
       <section class="system container" id="system">
-        <div class="section-heading"><div><p class="eyebrow"><span></span> FULL TOOLKIT</p><h2>从画面到互动<br />的一条工作流。</h2></div><p>完整版运行于本地 Python 服务，持续采集摄像头并驱动深度 rPPG 模型；网页控制台则负责可视化、OBS 接入与互动管理。</p></div>
+        <div class="section-heading"><div><p class="eyebrow"><span></span> COMPLETE WORKFLOW</p><h2>从一次采集，<br />到一场互动。</h2></div><p>本地服务负责连续采集与模型推理，直播控制台负责状态呈现、OBS 接入和互动管理，各环节清晰协作。</p></div>
         <div class="pipeline">
-          <article><span>01</span><div class="icon">◉</div><h3>连续采集</h3><p>本地 Python 服务独占摄像头，避免浏览器切页或最小化带来的帧率节流。</p></article>
-          <article><span>02</span><div class="icon">⌁</div><h3>时序推理</h3><p>人脸定位、rPPG 模型与信号处理形成稳定的 HR / SQI 输出。</p></article>
-          <article><span>03</span><div class="icon">⌇</div><h3>质量门控</h3><p>无人脸、信号不足或低质量时不沿用旧读数，明确展示当前状态。</p></article>
-          <article><span>04</span><div class="icon">↗</div><h3>直播呈现</h3><p>OBS Browser Source、透明心率 Overlay、录制与高光片段一体协作。</p></article>
+          <article><span>01</span><div class="icon">◉</div><h3>稳定采集</h3><p>本地服务持续接管摄像头，减少切页与后台运行造成的帧率波动。</p></article>
+          <article><span>02</span><div class="icon">⌁</div><h3>时序推理</h3><p>从人脸定位到 FacePhys 推理，持续生成脉率与信号质量。</p></article>
+          <article><span>03</span><div class="icon">⌇</div><h3>可信门控</h3><p>条件不足时立即清空旧读数，让每个状态真实、可解释。</p></article>
+          <article><span>04</span><div class="icon">↗</div><h3>直播呈现</h3><p>心率 Overlay、录制和高光片段，在 OBS 工作流中顺畅衔接。</p></article>
         </div>
       </section>
 
-      <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAMERA<small>视频帧</small></div><i>→</i><div>OPEN-RPPG<small>HR / SQI</small></div><i>→</i><div>OVERLAY<small>OBS / WEB</small></div></div><p>作品集站部署在 Vercel；完整模型、摄像头与密钥始终保留在本机，便于演示也保护隐私。</p></div></section>
+      <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAPTURE<small>本地视频帧</small></div><i>→</i><div>FACEPHYS<small>Pulse / SQI</small></div><i>→</i><div>OUTPUT<small>OBS / Web</small></div></div><p>网站由 Vercel 提供静态资源，摄像头画面与模型推理始终留在设备本地。体验更直接，隐私边界也更清晰。</p></div></section>
     </main>
-    <footer class="container"><a class="brand" href="#top"><span class="brand-mark">∿</span>OPEN-RPPG</a><span>REMOTE PHOTOPLETHYSMOGRAPHY · LOCAL-FIRST</span><a href="#top">回到顶部 ↑</a></footer>
-    <script type="module" src="app.js?v=20260722-facephys-v3"></script>
+    <footer class="container"><a class="brand" href="#top"><span class="brand-mark">∿</span>OPEN-RPPG</a><span>CAMERA-BASED PULSE · PROCESSED LOCALLY</span><a href="#top">返回顶部 ↑</a></footer>
+    <script type="module" src="app.js?v=20260722-design-v4"></script>
   </body>
 </html>
