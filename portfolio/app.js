@@ -1,5 +1,5 @@
 import { FaceTracker } from "./modules/face-tracker.js?v=20260721-facephys-v1";
-import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260721-facephys-v1";
+import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260722-facephys-v2";
 import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260721-facephys-v1";
 import { QUALITY_GATES, evaluateGate, qualityLevel } from "./modules/quality-gate.js?v=20260721-facephys-v1";
 
@@ -42,7 +42,7 @@ async function start() {
   } catch (error) {
     const cameraIsVisible = Boolean(state.stream && ui.camera.videoWidth);
     if (error?.name === "NotAllowedError") fail("未获得摄像头权限", "请在浏览器地址栏的站点权限中允许摄像头，然后重试。");
-    else if (cameraIsVisible) fail("FacePhys 模型未加载", "摄像头已成功开启；但本地 FacePhys 模型未能初始化。请刷新页面，确认 Vercel 已部署全部模型资源后重试。", { keepCamera: true });
+    else if (cameraIsVisible) fail("FacePhys 模型未加载", `摄像头已成功开启；但本地 FacePhys 初始化失败：${error?.message || "未知错误"}。请刷新页面，确认 Vercel 已部署全部模型资源后重试。`, { keepCamera: true });
     else fail("无法开启本地采集", "请确认设备存在可用摄像头，并使用 HTTPS 的 Chrome 或 Edge 页面访问。");
   } finally { ui.start.disabled = false; }
 }
