@@ -4,7 +4,7 @@ export class FacePhysEngine {
     this.worker?.terminate(); this.ready = false; this.pending = false;
     // LiteRT's WASM loader uses importScripts(), which is deliberately not
     // available to ES-module Workers in Edge/Chromium. Keep this Worker classic.
-    this.worker = new Worker(new URL("./facephys-worker.js", import.meta.url));
+    this.worker = new Worker(new URL("./facephys-worker.js?v=20260722-facephys-v3", import.meta.url));
     return new Promise((resolve, reject) => {
       let settled = false;
       const finishError = (error) => { if (settled) return; settled = true; clearTimeout(timer); this.pending = false; this.onError?.(error); reject(error); };

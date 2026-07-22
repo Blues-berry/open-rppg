@@ -1,5 +1,5 @@
 import { FaceTracker } from "./modules/face-tracker.js?v=20260721-facephys-v1";
-import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260722-facephys-v2";
+import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260722-facephys-v3";
 import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260721-facephys-v1";
 import { QUALITY_GATES, evaluateGate, qualityLevel } from "./modules/quality-gate.js?v=20260721-facephys-v1";
 

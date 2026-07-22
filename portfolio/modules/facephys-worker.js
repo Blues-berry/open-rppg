@@ -9,7 +9,28 @@ const wasmRoot = new URL("assets/vendor/litert/", siteRoot).href;
 const litertModuleUrl = new URL("assets/vendor/litert/index.js", siteRoot).href;
 
 self.onmessage = async ({ data }) => { try { if (data.type === "init") await init(); else if (data.type === "run") run(data.payload); else if (data.type === "reset") reset(); } catch (error) { self.postMessage({ type: "error", message: error?.message || String(error) }); } };
-async function init() { LiteRT = await import(litertModuleUrl); Tensor = LiteRT.Tensor; await LiteRT.loadLiteRt(wasmRoot); const [main, sqi, psd, state] = await Promise.all([fetch(asset("model.tflite")), fetch(asset("sqi_model.tflite")), fetch(asset("psd_model.tflite")), fetch(asset("state.gz"))]); if (![main,sqi,psd,state].every((r) => r.ok)) throw new Error("FacePhys 模型资源加载失败"); model = await LiteRT.loadAndCompile(URL.createObjectURL(new Blob([await main.arrayBuffer()])), { accelerator: "wasm" }); sqiModel = await LiteRT.loadAndCompile(URL.createObjectURL(new Blob([await sqi.arrayBuffer()])), { accelerator: "wasm" }); psdModel = await LiteRT.loadAndCompile(URL.createObjectURL(new Blob([await psd.arrayBuffer()])), { accelerator: "wasm" }); const stream = state.body.pipeThrough(new DecompressionStream("gzip")); initialState = await new Response(stream).json(); reset(); self.postMessage({ type: "ready" }); }
+async function init() {
+  LiteRT = await import(litertModuleUrl); Tensor = LiteRT.Tensor;
+  // Emscripten resolves the .wasm file relative to the parent Worker URL
+  // instead of the imported glue script. Redirect only those requests back
+  // to the versioned local LiteRT directory, matching the official demo.
+  const nativeFetch = self.fetch.bind(self);
+  self.fetch = (input, options) => {
+    const requested = typeof input === "string" ? input : input?.url || String(input);
+    if (/\.wasm(?:$|[?#])/.test(requested)) {
+      const fileName = new URL(requested, self.location.href).pathname.split("/").pop();
+      return nativeFetch(new URL(fileName, wasmRoot), options);
+    }
+    return nativeFetch(input, options);
+  };
+  try { await LiteRT.loadLiteRt(wasmRoot); } finally { self.fetch = nativeFetch; }
+  const [main, sqi, psd, state] = await Promise.all([fetch(asset("model.tflite")), fetch(asset("sqi_model.tflite")), fetch(asset("psd_model.tflite")), fetch(asset("state.gz"))]);
+  if (![main,sqi,psd,state].every((r) => r.ok)) throw new Error("FacePhys 模型资源加载失败");
+  model = await LiteRT.loadAndCompile(URL.createObjectURL(new Blob([await main.arrayBuffer()])), { accelerator: "wasm" });
+  sqiModel = await LiteRT.loadAndCompile(URL.createObjectURL(new Blob([await sqi.arrayBuffer()])), { accelerator: "wasm" });
+  psdModel = await LiteRT.loadAndCompile(URL.createObjectURL(new Blob([await psd.arrayBuffer()])), { accelerator: "wasm" });
+  const stream = state.body.pipeThrough(new DecompressionStream("gzip")); initialState = await new Response(stream).json(); reset(); self.postMessage({ type: "ready" });
+}
 function reset() { inputs.forEach((tensor) => tensor?.delete?.()); inputs = new Array(INPUT_COUNT); const meta = model.getInputDetails(); for (let i = 0; i < INPUT_COUNT; i += 1) { const detail = meta[i], size = detail.shape.reduce((a,b) => a*b, 1); let data; if (i === IMG_IDX) data = new Float32Array(size); else if (i === DT_IDX) data = new Float32Array([1/30]); else { const raw = initialState[detail.name]; data = raw ? new Float32Array(raw.flat(Infinity)) : new Float32Array(size); } inputs[i] = new Tensor(data, detail.shape); } bvp = new Float32Array(BUFFER_SIZE); cursor = 0; samples = 0; elapsed = 0; lastAnalysis = 0; }
 function run({ frame, dt, timestamp }) { if (!model) return; const safeDt = Math.min(.12, Math.max(.015, Number(dt) || 1/30)); inputs[IMG_IDX].delete(); inputs[DT_IDX].delete(); inputs[IMG_IDX] = new Tensor(frame, IMG_SHAPE); inputs[DT_IDX] = new Tensor(new Float32Array([safeDt]), [1]); const output = model.run(inputs), used = new Set(); for (const map of STATE_MAP) { const tensor = output[map.outIdx]; if (tensor) { inputs[map.inIdx]?.delete(); inputs[map.inIdx] = tensor; used.add(map.outIdx); } } const value = output[0]?.toTypedArray?.()[0] || 0; output.forEach((tensor, index) => { if (!used.has(index)) tensor?.delete?.(); }); bvp[cursor] = value; cursor = (cursor + 1) % BUFFER_SIZE; samples += 1; elapsed += safeDt; const now = performance.now(); let metrics = null; if (samples >= BUFFER_SIZE && now - lastAnalysis > 250) { lastAnalysis = now; metrics = analyze(safeDt); } self.postMessage({ type: "result", payload: { value, timestamp, samples, duration: elapsed, ...(metrics || {}) } }); }
 function analyze(dt) { const ordered = new Float32Array(BUFFER_SIZE); ordered.set(bvp.subarray(cursor)); ordered.set(bvp.subarray(0,cursor), BUFFER_SIZE-cursor); const input = new Tensor(ordered, [1, BUFFER_SIZE]); const sqiOutput = sqiModel.run([input]); const sqi = sqiOutput[0]?.toTypedArray?.()[0] || 0; sqiOutput.forEach((t) => t?.delete?.()); const psdOutput = psdModel.run([input]); const rawHr = psdOutput[0]?.toTypedArray?.()[0] || 0, freq = psdOutput[1]?.toTypedArray?.() || [], psd = psdOutput[2]?.toTypedArray?.() || []; psdOutput.forEach((t) => t?.delete?.()); input.delete(); return { sqi, bpm: rawHr / 30 / dt, spectrum: Array.from(freq, (f, i) => ({ bpm: f * 60 / dt, power: psd[i] || 0 })) }; }
