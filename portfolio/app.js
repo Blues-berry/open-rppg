@@ -1,7 +1,7 @@
-import { FaceTracker } from "./modules/face-tracker.js?v=20260721-facephys-v1";
-import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260722-facephys-v3";
-import { drawFaceOverlay, drawSpectrum, drawWaveform } from "./modules/draw.js?v=20260722-design-v4";
-import { QUALITY_GATES, evaluateGate, qualityLevel } from "./modules/quality-gate.js?v=20260721-facephys-v1";
+import { FaceTracker } from "./modules/face-tracker.js?v=20260722-spectrum-v5";
+import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260722-spectrum-v5";
+import { drawFaceOverlay, drawWaveform, SpectrumAnimator } from "./modules/draw.js?v=20260722-spectrum-v5";
+import { QUALITY_GATES, evaluateGate, qualityLevel } from "./modules/quality-gate.js?v=20260722-spectrum-v5";
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -14,11 +14,12 @@ const ui = {
 };
 
 const WARMUP_SECONDS = 15, FACE_INTERVAL_MS = 90, SAMPLE_INTERVAL_MS = 33;
-const state = { stream: null, tracker: null, engine: null, running: false, lastFaceAt: 0, lastSampleAt: 0, lastEngineAt: 0, lastFrameAt: 0, fpsSamples: [], face: null, faceInvalid: false, metrics: emptyMetrics(), phase: "idle", frameRequest: null, result: emptyResult(), waveform: [] };
+const state = { stream: null, tracker: null, engine: null, running: false, lastFaceAt: 0, lastSampleAt: 0, lastEngineAt: 0, lastFrameAt: 0, lastWaveDrawAt: 0, lastUiDrawAt: 0, lastAnalysisRevision: 0, fpsSamples: [], face: null, faceInvalid: false, metrics: emptyMetrics(), phase: "idle", frameRequest: null, result: emptyResult(), waveform: [] };
 const sampleCtx = ui.sampleCanvas.getContext("2d", { willReadFrequently: true });
+const spectrumAnimator = new SpectrumAnimator(ui.spectrum, 180);
 
 function emptyMetrics() { return { face: 0, light: 0, motion: 0, signal: 0, sqi: 0, fps: 0, brightness: 0, samples: 0, duration: 0, peak: 0 }; }
-function emptyResult() { return { duration: 0, samples: 0, bpm: 0, sqi: 0, spectrum: [] }; }
+function emptyResult() { return { duration: 0, samples: 0, bpm: 0, sqi: 0, spectrum: [], analysisRevision: 0 }; }
 function clamp(value, min = 0, max = 1) { return Math.min(max, Math.max(min, Number.isFinite(value) ? value : min)); }
 function percent(value) { return `${Math.round(clamp(value) * 100)}%`; }
 function setPhase(phase, status, hint) { state.phase = phase; ui.lab.dataset.phase = phase; ui.phase.textContent = status; ui.status.textContent = status; ui.hint.textContent = hint; }
@@ -35,7 +36,7 @@ async function start() {
     ui.camera.srcObject = state.stream; await ui.camera.play(); ui.empty.hidden = true; ui.guide.hidden = false; ui.cameraStatus.textContent = "CAMERA LIVE";
     setPhase("model", "正在准备本地模型", "FacePhys 与 LiteRT 正在设备上初始化，请稍候。");
     state.tracker = await FaceTracker.create();
-    state.engine = new FacePhysEngine(onFacePhysResult, onFacePhysError);
+    state.engine = new FacePhysEngine(onFacePhysFrame, onFacePhysAnalysis, onFacePhysError);
     await state.engine.initialize();
     state.running = true; ui.start.textContent = "停止采集 ×"; ui.start.classList.add("stop"); ui.start.disabled = false;
     setPhase("searching", "正在寻找人脸", "请正对镜头并保持居中，让面部光线尽量均匀。"); nextFrame();
@@ -64,9 +65,9 @@ function modelErrorHint(error) {
 }
 
 function resetSession() {
-  state.face = null; state.faceInvalid = false; state.metrics = emptyMetrics(); state.result = emptyResult(); state.waveform = []; state.lastFaceAt = 0; state.lastSampleAt = 0; state.lastEngineAt = 0; state.lastFrameAt = 0; state.fpsSamples = [];
+  state.face = null; state.faceInvalid = false; state.metrics = emptyMetrics(); state.result = emptyResult(); state.waveform = []; state.lastFaceAt = 0; state.lastSampleAt = 0; state.lastEngineAt = 0; state.lastFrameAt = 0; state.lastWaveDrawAt = 0; state.lastUiDrawAt = 0; state.lastAnalysisRevision = 0; state.fpsSamples = [];
   ui.bpm.textContent = "--"; ui.sqi.textContent = "--"; ui.sqiOrb.classList.remove("is-live"); ui.fps.textContent = "-- FPS"; ui.window.textContent = `0.0 / ${WARMUP_SECONDS.toFixed(1)} s`; ui.calibrationBar.style.width = "0%"; ui.calibrationLabel.textContent = "等待采样窗口"; ui.faceStatus.textContent = "FACE: --"; ui.roiStatus.textContent = "ROI: --"; ui.waveState.textContent = "等待有效 ROI"; ui.peak.textContent = "-- BPM";
-  updateQuality(emptyMetrics()); drawFaceOverlay(ui.overlay, ui.camera, null); drawWaveform(ui.wave, []); drawSpectrum(ui.spectrum, []); resetChecklist();
+  updateQuality(emptyMetrics()); drawFaceOverlay(ui.overlay, ui.camera, null); drawWaveform(ui.wave, []); spectrumAnimator.clear(); resetChecklist();
 }
 
 function fail(status, hint, { keepCamera = false } = {}) {
@@ -93,7 +94,7 @@ function recordFps(now) { if (state.lastFrameAt) state.fpsSamples.push(now - sta
 function invalidateFace(reason) {
   state.engine?.reset(); state.result = emptyResult(); state.waveform = []; state.metrics = { ...emptyMetrics(), fps: state.metrics.fps }; state.lastEngineAt = 0;
   ui.bpm.textContent = "--"; ui.sqi.textContent = "--"; ui.sqiOrb.classList.remove("is-live"); ui.faceStatus.textContent = "FACE: LOST"; ui.roiStatus.textContent = "ROI: PAUSED"; ui.window.textContent = `0.0 / ${WARMUP_SECONDS.toFixed(1)} s`; ui.calibrationBar.style.width = "0%"; ui.calibrationLabel.textContent = "等待可用人脸"; ui.waveState.textContent = "采样已暂停"; ui.peak.textContent = "-- BPM";
-  updateQuality(state.metrics); drawWaveform(ui.wave, []); drawSpectrum(ui.spectrum, []); setChecklist("face", false); setChecklist("signal", false);
+  state.lastAnalysisRevision = 0; updateQuality(state.metrics); drawWaveform(ui.wave, []); spectrumAnimator.clear(); setChecklist("face", false); setChecklist("signal", false);
   const status = reason === "multiple" ? "画面中人数过多" : "正在寻找人脸"; const hint = reason === "multiple" ? "请保持一人入镜，以免检测目标发生切换。" : reason === "small" ? "请稍微靠近镜头，让完整面部清晰可见。" : reason === "pose" ? "请正对镜头，减少侧脸、低头或遮挡。" : "请正对镜头并保持居中，让面部光线尽量均匀。"; setPhase("searching", status, hint);
 }
 
@@ -111,20 +112,32 @@ function ingestSample(now, sample) {
   state.metrics = { ...state.metrics, brightness, light, motion, face }; ui.faceStatus.textContent = "FACE: LOCKED"; ui.roiStatus.textContent = "ROI: FACEPHYS"; setChecklist("face", face >= QUALITY_GATES.face); setChecklist("light", light >= QUALITY_GATES.light); setChecklist("motion", motion >= QUALITY_GATES.motion);
 }
 
-function onFacePhysResult(result) {
-  if (!state.running || !state.face?.valid) return; state.result = { ...state.result, ...result, spectrum: Array.isArray(result.spectrum) ? result.spectrum : [] }; state.waveform.push(result.value || 0); if (state.waveform.length > 450) state.waveform.shift(); analyze();
+function onFacePhysFrame(frame) {
+  if (!state.running || !state.face?.valid) return;
+  state.result = { ...state.result, duration: frame.duration || 0, samples: frame.samples || 0 };
+  state.waveform.push(frame.value || 0); if (state.waveform.length > 450) state.waveform.shift();
+  const now = performance.now();
+  if (now - state.lastWaveDrawAt >= 1000 / 15) { state.lastWaveDrawAt = now; drawWaveform(ui.wave, state.waveform); }
+  if (now - state.lastUiDrawAt >= 100) { state.lastUiDrawAt = now; renderStatus(); }
+}
+
+function onFacePhysAnalysis(analysis) {
+  if (!state.running || !state.face?.valid || analysis.analysisRevision <= state.lastAnalysisRevision) return;
+  state.lastAnalysisRevision = analysis.analysisRevision;
+  state.result = { ...state.result, ...analysis, spectrum: Array.isArray(analysis.spectrum) ? analysis.spectrum : state.result.spectrum };
+  spectrumAnimator.update(state.result.spectrum, state.result.bpm); renderStatus();
 }
 function onFacePhysError(error) { if (state.running) fail("FacePhys 推理异常", `本地模型已停止：${error.message || "未知错误"}。请刷新页面后重试。`, { keepCamera: Boolean(state.stream) }); }
 
-function analyze() {
+function renderStatus() {
   const result = state.result, signal = result.sqi || 0, metrics = { ...state.metrics, signal, sqi: result.sqi || 0, samples: result.samples || 0, duration: result.duration || 0, peak: result.bpm || 0 }; state.metrics = metrics;
   const readiness = clamp(metrics.duration / WARMUP_SECONDS); ui.window.textContent = `${Math.min(metrics.duration, WARMUP_SECONDS).toFixed(1)} / ${WARMUP_SECONDS.toFixed(1)} s`; ui.calibrationBar.style.width = percent(readiness); ui.calibrationLabel.textContent = metrics.duration < WARMUP_SECONDS ? "正在建立脉搏窗口" : "脉搏窗口已建立";
   const gate = evaluateGate(metrics, result, WARMUP_SECONDS); ui.waveState.textContent = metrics.duration < WARMUP_SECONDS ? "正在积累时序信号" : gate.code === "signal" ? "信号质量暂未达标" : gate.accepted ? "本地推理稳定" : `等待${gate.title}`; ui.peak.textContent = result.bpm ? `${Math.round(result.bpm)} BPM` : "-- BPM";
-  updateQuality(metrics); drawWaveform(ui.wave, state.waveform); drawSpectrum(ui.spectrum, result.spectrum, result.bpm); setChecklist("face", metrics.face >= QUALITY_GATES.face); setChecklist("light", metrics.light >= QUALITY_GATES.light); setChecklist("motion", metrics.motion >= QUALITY_GATES.motion); setChecklist("signal", gate.accepted);
+  updateQuality(metrics); setChecklist("face", metrics.face >= QUALITY_GATES.face); setChecklist("light", metrics.light >= QUALITY_GATES.light); setChecklist("motion", metrics.motion >= QUALITY_GATES.motion); setChecklist("signal", gate.accepted);
   if (gate.accepted) { ui.bpm.textContent = Math.round(result.bpm); ui.sqi.textContent = result.sqi.toFixed(2); ui.sqiOrb.classList.add("is-live"); setPhase("live", gate.title, gate.hint); }
   else { ui.bpm.textContent = "--"; ui.sqi.textContent = result.sqi ? result.sqi.toFixed(2) : "--"; ui.sqiOrb.classList.remove("is-live"); if (gate.candidateBpm) ui.waveState.textContent = `候选峰值 ${Math.round(gate.candidateBpm)} BPM，等待条件达标`; setPhase("calibrating", gate.title, gate.hint); }
 }
 
 function updateQuality(metrics) { [[ui.faceQuality, ui.faceBar, metrics.face], [ui.lightQuality, ui.lightBar, metrics.light], [ui.motionQuality, ui.motionBar, metrics.motion], [ui.signalQuality, ui.signalBar, metrics.signal]].forEach(([value, bar, score]) => { value.textContent = score ? percent(score) : "--"; bar.style.width = percent(score); bar.closest(".quality-card").dataset.level = qualityLevel(score); }); }
 function handleVisibility() { if (document.hidden && state.running) { setPhase("paused", "采集已暂停", "页面进入后台后已暂停采样；返回此页后请重新开始。"); stop(); } }
-ui.start.addEventListener("click", () => state.stream ? stop() : start()); window.addEventListener("resize", () => drawFaceOverlay(ui.overlay, ui.camera, state.face)); window.addEventListener("beforeunload", stop); document.addEventListener("visibilitychange", handleVisibility); resetSession();
+ui.start.addEventListener("click", () => state.stream ? stop() : start()); window.addEventListener("resize", () => { drawFaceOverlay(ui.overlay, ui.camera, state.face); spectrumAnimator.redraw(); }); window.addEventListener("beforeunload", stop); document.addEventListener("visibilitychange", handleVisibility); resetSession();
