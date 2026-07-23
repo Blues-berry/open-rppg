@@ -6,14 +6,14 @@
     <meta name="description" content="Open-rPPG：在浏览器本地完成 FacePhys 推理，让摄像头画面呈现实时脉搏与信号质量。" />
     <meta name="theme-color" content="#08100f" />
     <title>Open-rPPG · 看见画面中的脉搏</title>
-    <link rel="stylesheet" href="styles.css?v=20260722-spectrum-v5" />
+    <link rel="stylesheet" href="styles.css?v=20260723-deck-v6" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
     <header class="nav container">
       <a class="brand" href="#top" aria-label="Open-rPPG 首页"><span class="brand-mark">∿</span>OPEN-RPPG</a>
       <nav aria-label="站内导航">
-        <a href="#experience">在线体验</a><a href="#system">核心能力</a><a href="#workflow">运行方式</a>
+        <a href="#experience">在线体验</a><a href="#system">核心能力</a><a href="#materials">项目材料</a><a href="#workflow">运行方式</a>
       </nav>
       <a class="nav-cta" href="#experience">立即体验 <span>↗</span></a>
     </header>
@@ -112,9 +112,39 @@
         </div>
       </section>
 
+      <section class="materials container" id="materials">
+        <div class="section-heading">
+          <div><p class="eyebrow"><span></span> PROJECT DECK · 8 PAGES</p><h2>补充材料，<br />完整讲清项目。</h2></div>
+          <p>评委版演示文稿梳理了项目价值、技术闭环、核心场景与落地路径。可在网页内阅读，也可下载原始 PowerPoint。</p>
+        </div>
+        <article class="deck-card">
+          <div class="deck-cover">
+            <img src="assets/documents/wuganxinhu-cover.png" alt="《无感心护》评委版演示文稿封面" loading="lazy" />
+            <div class="deck-cover-meta"><span>SUPPLEMENTARY MATERIAL</span><b>08 SLIDES</b></div>
+          </div>
+          <div class="deck-copy">
+            <p class="micro-label">PROJECT PRESENTATION</p>
+            <h3>无感心护 · 评委版</h3>
+            <p>面向康复与居家照护的非接触式生命体征观察助手，从需求判断、产品方案到三类核心场景与 MVP 路径。</p>
+            <dl class="deck-facts"><div><dt>内容</dt><dd>8 页</dd></div><div><dt>预览</dt><dd>PDF · 4.0 MB</dd></div><div><dt>附件</dt><dd>PPTX · 40.0 MB</dd></div></dl>
+            <div class="deck-actions">
+              <button class="deck-action primary" id="deckToggle" type="button" aria-expanded="false" aria-controls="deckViewer">网页内阅读 <span>↓</span></button>
+              <a class="deck-action quiet" href="assets/documents/wuganxinhu-judge-deck.pptx" download>下载 PPTX <span>↓</span></a>
+              <a class="deck-text-link" href="assets/documents/wuganxinhu-judge-deck.pdf" target="_blank" rel="noopener">单独打开 PDF ↗</a>
+            </div>
+            <p class="deck-note">附件仅作项目说明；生命体征结果不用于医疗诊断或治疗决策。</p>
+          </div>
+        </article>
+        <div class="deck-viewer" id="deckViewer" hidden>
+          <div class="deck-viewer-bar"><div><span>DOCUMENT VIEWER</span><b>无感心护 · 评委版</b></div><button id="deckClose" type="button" aria-label="关闭演示文稿预览">关闭 ×</button></div>
+          <iframe id="deckFrame" title="无感心护评委版 PDF 在线预览" data-src="assets/documents/wuganxinhu-judge-deck.pdf#view=FitH&page=1" loading="lazy"></iframe>
+          <p>若浏览器无法显示 PDF，请使用“单独打开 PDF”或下载原始 PPTX。</p>
+        </div>
+      </section>
+
       <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAPTURE<small>本地视频帧</small></div><i>→</i><div>FACEPHYS<small>Pulse / SQI</small></div><i>→</i><div>OUTPUT<small>OBS / Web</small></div></div><p>网站由 Vercel 提供静态资源，摄像头画面与模型推理始终留在设备本地。体验更直接，隐私边界也更清晰。</p></div></section>
     </main>
     <footer class="container"><a class="brand" href="#top"><span class="brand-mark">∿</span>OPEN-RPPG</a><span>CAMERA-BASED PULSE · PROCESSED LOCALLY</span><a href="#top">返回顶部 ↑</a></footer>
-    <script type="module" src="app.js?v=20260722-spectrum-v5"></script>
+    <script type="module" src="app.js?v=20260723-deck-v6"></script>
   </body>
 </html>

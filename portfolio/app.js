@@ -17,6 +17,7 @@ const WARMUP_SECONDS = 15, FACE_INTERVAL_MS = 90, SAMPLE_INTERVAL_MS = 33;
 const state = { stream: null, tracker: null, engine: null, running: false, lastFaceAt: 0, lastSampleAt: 0, lastEngineAt: 0, lastFrameAt: 0, lastWaveDrawAt: 0, lastUiDrawAt: 0, lastAnalysisRevision: 0, fpsSamples: [], face: null, faceInvalid: false, metrics: emptyMetrics(), phase: "idle", frameRequest: null, result: emptyResult(), waveform: [] };
 const sampleCtx = ui.sampleCanvas.getContext("2d", { willReadFrequently: true });
 const spectrumAnimator = new SpectrumAnimator(ui.spectrum, 180);
+const deckUi = { toggle: $("deckToggle"), close: $("deckClose"), viewer: $("deckViewer"), frame: $("deckFrame") };
 
 function emptyMetrics() { return { face: 0, light: 0, motion: 0, signal: 0, sqi: 0, fps: 0, brightness: 0, samples: 0, duration: 0, peak: 0 }; }
 function emptyResult() { return { duration: 0, samples: 0, bpm: 0, sqi: 0, spectrum: [], analysisRevision: 0 }; }
@@ -140,4 +141,13 @@ function renderStatus() {
 
 function updateQuality(metrics) { [[ui.faceQuality, ui.faceBar, metrics.face], [ui.lightQuality, ui.lightBar, metrics.light], [ui.motionQuality, ui.motionBar, metrics.motion], [ui.signalQuality, ui.signalBar, metrics.signal]].forEach(([value, bar, score]) => { value.textContent = score ? percent(score) : "--"; bar.style.width = percent(score); bar.closest(".quality-card").dataset.level = qualityLevel(score); }); }
 function handleVisibility() { if (document.hidden && state.running) { setPhase("paused", "采集已暂停", "页面进入后台后已暂停采样；返回此页后请重新开始。"); stop(); } }
+function setDeckViewer(open) {
+  if (!deckUi.viewer || !deckUi.frame || !deckUi.toggle) return;
+  if (open && !deckUi.frame.getAttribute("src")) deckUi.frame.src = deckUi.frame.dataset.src;
+  deckUi.viewer.hidden = !open; deckUi.toggle.setAttribute("aria-expanded", String(open));
+  deckUi.toggle.innerHTML = open ? "收起预览 <span>↑</span>" : "网页内阅读 <span>↓</span>";
+  if (open) requestAnimationFrame(() => deckUi.viewer.scrollIntoView({ behavior: "smooth", block: "start" }));
+}
 ui.start.addEventListener("click", () => state.stream ? stop() : start()); window.addEventListener("resize", () => { drawFaceOverlay(ui.overlay, ui.camera, state.face); spectrumAnimator.redraw(); }); window.addEventListener("beforeunload", stop); document.addEventListener("visibilitychange", handleVisibility); resetSession();
+deckUi.toggle?.addEventListener("click", () => setDeckViewer(deckUi.toggle.getAttribute("aria-expanded") !== "true"));
+deckUi.close?.addEventListener("click", () => setDeckViewer(false));
