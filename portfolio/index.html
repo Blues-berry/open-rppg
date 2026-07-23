@@ -6,7 +6,7 @@
     <meta name="description" content="Open-rPPG：在浏览器本地完成 FacePhys 推理，让摄像头画面呈现实时脉搏与信号质量。" />
     <meta name="theme-color" content="#08100f" />
     <title>Open-rPPG · 看见画面中的脉搏</title>
-    <link rel="stylesheet" href="styles.css?v=20260723-deck-v6" />
+    <link rel="stylesheet" href="styles.css?v=20260723-motion-v8" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -20,6 +20,7 @@
 
     <main id="top">
       <section class="hero container">
+        <div class="line-waves" id="lineWaves" aria-hidden="true"></div>
         <div class="hero-copy">
           <p class="eyebrow"><span></span> LOCAL PULSE LAB · FACEPHYS</p>
           <h1>让每一帧<br /><em>显露心迹</em></h1>
@@ -105,10 +106,11 @@
       <section class="system container" id="system">
         <div class="section-heading"><div><p class="eyebrow"><span></span> COMPLETE WORKFLOW</p><h2>完美接入<br />直播互动</h2></div><p>本地服务负责连续采集与模型推理，直播控制台负责状态呈现、OBS 接入和互动管理，各环节清晰协作。</p></div>
         <div class="pipeline">
-          <article><span>01</span><div class="icon">◉</div><h3>稳定采集</h3><p>本地服务持续接管摄像头，减少切页与后台运行造成的帧率波动。</p></article>
-          <article><span>02</span><div class="icon">⌁</div><h3>时序推理</h3><p>从人脸定位到 FacePhys 推理，持续生成脉率与信号质量。</p></article>
-          <article><span>03</span><div class="icon">⌇</div><h3>可信门控</h3><p>条件不足时立即清空旧读数，让每个状态真实、可解释。</p></article>
-          <article><span>04</span><div class="icon">↗</div><h3>直播呈现</h3><p>心率 Overlay、录制和高光片段，在 OBS 工作流中顺畅衔接。</p></article>
+          <article tabindex="0"><span>01</span><div class="icon">◉</div><h3>稳定采集</h3><p>本地服务持续接管摄像头，减少切页与后台运行造成的帧率波动。</p></article>
+          <article tabindex="0"><span>02</span><div class="icon">⌁</div><h3>时序推理</h3><p>从人脸定位到 FacePhys 推理，持续生成脉率与信号质量。</p></article>
+          <article tabindex="0"><span>03</span><div class="icon">⌇</div><h3>可信门控</h3><p>条件不足时立即清空旧读数，让每个状态真实、可解释。</p></article>
+          <article tabindex="0"><span>04</span><div class="icon">↗</div><h3>直播呈现</h3><p>心率 Overlay、录制和高光片段，在 OBS 工作流中顺畅衔接。</p></article>
+          <span class="pipeline-focus" aria-hidden="true"></span>
         </div>
       </section>
 
@@ -145,6 +147,6 @@
       <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAPTURE<small>本地视频帧</small></div><i>→</i><div>FACEPHYS<small>Pulse / SQI</small></div><i>→</i><div>OUTPUT<small>OBS / Web</small></div></div><p>网站由 Vercel 提供静态资源，摄像头画面与模型推理始终留在设备本地。体验更直接，隐私边界也更清晰。</p></div></section>
     </main>
     <footer class="container"><a class="brand" href="#top"><span class="brand-mark">∿</span>OPEN-RPPG</a><span>CAMERA-BASED PULSE · PROCESSED LOCALLY</span><a href="#top">返回顶部 ↑</a></footer>
-    <script type="module" src="app.js?v=20260723-deck-v6"></script>
+    <script type="module" src="app.js?v=20260723-motion-v8"></script>
   </body>
 </html>

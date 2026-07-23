@@ -16,3 +16,10 @@
 - `assets/models/face_landmarker.task`：MediaPipe Face Landmarker 的官方 float16 模型副本，用于单人脸关键点与 ROI 定位；模型仅作为本站点静态资源加载。使用、再分发前请遵守 [MediaPipe 模型页面](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker)及其适用条款。
 
 网页体验采用本地 MediaPipe 人脸定位、FacePhys LiteRT/TFLite 时序模型和随官方 Demo 发布的 SQI、频谱模型。FacePhys 与 SQI/PSD 分别运行在独立 Worker 中，频谱按设备性能在约 4–8 Hz 自适应分析，避免阻塞主推理。模型文件、LiteRT 运行时和 WASM 都从本站点静态路径加载；FacePhys 的许可文本已随模型保存在 `assets/models/facephys/LICENSE.txt`。它仍是工程互动演示而非医疗器械；光照、动作、摄像头与肤色都会显著影响结果。
+
+## 动效组件与许可
+
+- 首屏 Line Waves 与采集仪表 Border Glow 基于 [React Bits](https://github.com/DavidHDev/react-bits) 的公开组件移植为原生 ES Module；本项目不引入 React、GSAP 或运行时 CDN。对应许可保存在 `assets/vendor/react-bits/LICENSE.md`。
+- Line Waves 使用本地打包的 [OGL 1.0.11](https://github.com/oframe/ogl)，只导出渲染所需的 `Renderer`、`Program`、`Mesh` 与 `Triangle`；许可保存在 `assets/vendor/ogl/LICENSE.txt`。
+- 核心能力卡片的共享悬停焦点参考 [Aceternity Card Hover Effect](https://ui.aceternity.com/components/card-hover-effect)，使用原生 CSS 与指针事件重新实现。
+- 环境动效在页面隐藏、首屏离开视口或摄像头采集期间自动暂停；启用“减少动态效果”时使用静态降级样式。

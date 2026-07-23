@@ -2,6 +2,7 @@ import { FaceTracker } from "./modules/face-tracker.js?v=20260722-spectrum-v5";
 import { FacePhysEngine } from "./modules/facephys-engine.js?v=20260722-spectrum-v5";
 import { drawFaceOverlay, drawWaveform, SpectrumAnimator } from "./modules/draw.js?v=20260722-spectrum-v5";
 import { QUALITY_GATES, evaluateGate, qualityLevel } from "./modules/quality-gate.js?v=20260722-spectrum-v5";
+import { initAmbientUi } from "./modules/ambient-ui.js?v=20260723-motion-v8";
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -18,6 +19,7 @@ const state = { stream: null, tracker: null, engine: null, running: false, lastF
 const sampleCtx = ui.sampleCanvas.getContext("2d", { willReadFrequently: true });
 const spectrumAnimator = new SpectrumAnimator(ui.spectrum, 180);
 const deckUi = { toggle: $("deckToggle"), close: $("deckClose"), viewer: $("deckViewer"), frame: $("deckFrame") };
+const ambientUi = initAmbientUi();
 
 function emptyMetrics() { return { face: 0, light: 0, motion: 0, signal: 0, sqi: 0, fps: 0, brightness: 0, samples: 0, duration: 0, peak: 0 }; }
 function emptyResult() { return { duration: 0, samples: 0, bpm: 0, sqi: 0, spectrum: [], analysisRevision: 0 }; }
@@ -31,6 +33,7 @@ async function start() {
   if (state.running || state.stream) return stop();
   if (!navigator.mediaDevices?.getUserMedia) return fail("无法使用摄像头", "请使用最新版 Chrome 或 Edge，并确认浏览器支持摄像头访问。");
   resetSession();
+  ambientUi.setCaptureActive(true);
   try {
     setPhase("permission", "等待摄像头授权", "请在浏览器提示中允许访问摄像头，画面仅在当前设备处理。"); ui.start.disabled = true;
     state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, min: 20 } }, audio: false });
@@ -53,6 +56,7 @@ function stop() {
   state.running = false; if (state.frameRequest) cancelAnimationFrame(state.frameRequest); state.frameRequest = null;
   state.stream?.getTracks().forEach((track) => track.stop()); state.stream = null; ui.camera.srcObject = null;
   state.tracker?.close(); state.tracker = null; state.engine?.destroy(); state.engine = null; resetSession();
+  ambientUi.setCaptureActive(false);
   ui.empty.hidden = false; ui.guide.hidden = false; ui.cameraStatus.textContent = "STANDBY"; ui.start.textContent = "开启摄像头 →"; ui.start.classList.remove("stop");
   setPhase("idle", "等待开始", "开启摄像头后，FacePhys 将在本机建立脉搏信号窗口。");
 }
@@ -75,6 +79,7 @@ function fail(status, hint, { keepCamera = false } = {}) {
   state.running = false; if (state.frameRequest) cancelAnimationFrame(state.frameRequest); state.frameRequest = null; state.tracker?.close(); state.tracker = null; state.engine?.destroy(); state.engine = null;
   if (keepCamera) { ui.empty.hidden = true; ui.guide.hidden = false; ui.start.textContent = "停止摄像头 ×"; ui.start.classList.add("stop"); ui.cameraStatus.textContent = "CAMERA LIVE"; ui.faceStatus.textContent = "FACE: MODEL ERROR"; ui.roiStatus.textContent = "ROI: PAUSED"; }
   else { state.stream?.getTracks().forEach((track) => track.stop()); state.stream = null; ui.camera.srcObject = null; ui.empty.hidden = false; ui.start.textContent = "重新尝试 →"; ui.start.classList.remove("stop"); ui.cameraStatus.textContent = "CAMERA ERROR"; }
+  ambientUi.setCaptureActive(Boolean(state.stream));
   setPhase("error", status, hint);
 }
 
@@ -148,6 +153,6 @@ function setDeckViewer(open) {
   deckUi.toggle.innerHTML = open ? "收起预览 <span>↑</span>" : "网页内阅读 <span>↓</span>";
   if (open) requestAnimationFrame(() => deckUi.viewer.scrollIntoView({ behavior: "smooth", block: "start" }));
 }
-ui.start.addEventListener("click", () => state.stream ? stop() : start()); window.addEventListener("resize", () => { drawFaceOverlay(ui.overlay, ui.camera, state.face); spectrumAnimator.redraw(); }); window.addEventListener("beforeunload", stop); document.addEventListener("visibilitychange", handleVisibility); resetSession();
+ui.start.addEventListener("click", () => state.stream ? stop() : start()); window.addEventListener("resize", () => { drawFaceOverlay(ui.overlay, ui.camera, state.face); spectrumAnimator.redraw(); }); window.addEventListener("beforeunload", () => { stop(); ambientUi.destroy(); }, { once: true }); document.addEventListener("visibilitychange", handleVisibility); resetSession();
 deckUi.toggle?.addEventListener("click", () => setDeckViewer(deckUi.toggle.getAttribute("aria-expanded") !== "true"));
 deckUi.close?.addEventListener("click", () => setDeckViewer(false));
