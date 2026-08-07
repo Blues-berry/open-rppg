@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>rPPG Camera Source</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="camera-source-body">
+    <img id="obsCameraSource" alt="rPPG camera source" src="/api/capture/preview.mjpg" />
+    <script>
+      const source = document.getElementById("obsCameraSource");
+      source.addEventListener("error", () => {
+        window.setTimeout(() => {
+          source.src = `/api/capture/preview.mjpg?t=${Date.now()}`;
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

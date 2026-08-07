@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>直播心率 Overlay</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111315'/%3E%3Cpath d='M9 18c2-6 5-7 7-2 2-5 5-4 7 2' fill='none' stroke='%23ff6b83' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M8 24h16' stroke='%2355d2b0' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="overlay-body">
+    <div id="overlayWidget" class="overlay-widget">
+      <div id="overlayPulse" class="overlay-pulse">
+        <span class="heart-ring"></span>
+        <span class="heart-shape"></span>
+      </div>
+      <div class="overlay-copy">
+        <span id="overlayLabel">LIVE HEART</span>
+        <strong><span id="overlayBpm">--</span><small>BPM</small></strong>
+        <em id="overlayStatus">等待采样</em>
+      </div>
+    </div>
+    <div id="agentSubtitle" class="agent-subtitle" hidden aria-live="polite"></div>
+
+    <script src="overlay.js"></script>
+  </body>
+</html>

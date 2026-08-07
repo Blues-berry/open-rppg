@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>直播心率补光插件</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111315'/%3E%3Cpath d='M9 18c2-6 5-7 7-2 2-5 5-4 7 2' fill='none' stroke='%23ff6b83' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M8 24h16' stroke='%2355d2b0' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css?v=20260719-live-v4" />
+  </head>
+  <body>
+    <main class="plugin-shell">
+      <header class="topbar">
+        <div class="topbar-brand">
+          <p class="eyebrow"><span class="live-indicator"></span>LIVE CONTROL ROOM · OBS + B站</p>
+          <h1>直播心率补光控制台</h1>
+        </div>
+        <div class="topbar-state">
+          <span id="captureState" class="state-pill waiting">WAITING</span>
+        </div>
+        <div class="topbar-actions">
+          <a class="link-button" href="camera.html" target="_blank" rel="noreferrer">摄像头源</a>
+          <a class="link-button" href="overlay.html" target="_blank" rel="noreferrer">Overlay</a>
+          <button id="startBtn" class="primary" type="button">启动采集</button>
+          <button id="stopBtn" class="danger" type="button">停止采集</button>
+        </div>
+      </header>
+
+      <div id="frontendWarning" class="runtime-banner bad" hidden></div>
+      <div id="backendWarning" class="runtime-banner warn" hidden></div>
+
+      <section class="dashboard-layout">
+        <div class="preview-column">
+          <section class="camera-card">
+            <div class="card-head">
+              <div>
+                <h2>后端摄像头采集</h2>
+                <p id="captureHint">服务端会独立打开摄像头并持续推理；这个页面关闭后采集仍会继续。</p>
+              </div>
+            </div>
+
+            <div class="paired-preview-panel">
+              <div class="preview-strip-head">
+                <span>当前 OBS 输出 / 补光预览</span>
+                <small>在右侧预览拖动可调整灯位 X/Y</small>
+              </div>
+              <div class="preview-stream-grid">
+                <div class="preview-stream">
+                  <div class="preview-stream-label">
+                    <span>当前 OBS 输出</span>
+                    <small>跟随补光开关</small>
+                  </div>
+                  <div class="preview-stage">
+                    <img
+                      id="currentOutputPreview"
+                      alt="Current OBS camera output preview"
+                      src="/api/capture/preview.mjpg"
+                      data-src="/api/capture/preview.mjpg"
+                    />
+                  </div>
+                </div>
+                <div id="lightPreviewStream" class="preview-stream" hidden aria-hidden="true">
+                  <div class="preview-stream-label">
+                    <span>补光预览</span>
+                    <small>拖动调整灯位</small>
+                  </div>
+                  <div id="pairedPreviewStage" class="paired-preview-stage preview-stage">
+                    <img
+                      id="pairedLightPreview"
+                      alt="Virtual fill light preview"
+                      data-src="/api/capture/light-preview.mjpg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="output-telemetry-panel">
+              <div class="preview-strip-head telemetry-head">
+                <span>心率波形 / 参考数据</span>
+                <small>真实 BVP，近 10 秒</small>
+              </div>
+              <canvas id="waveCanvas" width="1280" height="220"></canvas>
+              <div class="telemetry-grid">
+                <div>
+                  <span>直播 BPM</span>
+                  <strong id="telemetryBpmText">--</strong>
+                </div>
+                <div>
+                  <span>模型 HR</span>
+                  <strong id="telemetryModelHrText">--</strong>
+                </div>
+                <div>
+                  <span>SQI</span>
+                  <strong id="telemetrySqiText">--</strong>
+                </div>
+                <div>
+                  <span>置信度</span>
+                  <strong id="telemetryConfidenceText">0%</strong>
+                </div>
+                <div>
+                  <span>输出状态</span>
+                  <strong id="telemetryStatusText">锁定</strong>
+                </div>
+                <div>
+                  <span>窗口</span>
+                  <strong id="telemetryWindowText">0s</strong>
+                </div>
+              </div>
+              <div class="quality-grid">
+                <div>
+                  <span>采集稳定</span>
+                  <meter id="brightnessMeter" min="0" max="100" value="0"></meter>
+                  <strong id="brightnessText">0%</strong>
+                </div>
+                <div>
+                  <span>人脸状态</span>
+                  <meter id="motionMeter" min="0" max="100" value="0"></meter>
+                  <strong id="motionText">0%</strong>
+                </div>
+                <div>
+                  <span>SQI</span>
+                  <meter id="peakMeter" min="0" max="100" value="0"></meter>
+                  <strong id="peakText">0%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="controls">
+              <button id="cameraSourceBtn" type="button">复制摄像头源地址</button>
+              <button id="resetBtn" type="button">重置模型窗口</button>
+              <button id="copyOverlayBtn" type="button">复制 Overlay 地址</button>
+            </div>
+          </section>
+
+          <section class="overlay-card">
+            <div class="card-head compact">
+              <div>
+                <h2>直播 Overlay 预览</h2>
+                <p>OBS 中添加 camera.html 作为摄像头画面，添加 overlay.html 作为心率 Overlay。</p>
+              </div>
+            </div>
+            <iframe id="overlayPreview" title="Overlay preview" src="overlay.html?preview=1"></iframe>
+          </section>
+
+          <section class="upload-card">
+            <div class="card-head compact">
+              <div>
+                <h2>上传视频识别心率</h2>
+                <p>离线分析已有视频，使用同一个 FacePhys 模型输出 HR/SQI，不影响当前直播采集。</p>
+              </div>
+            </div>
+            <div class="upload-panel">
+              <label class="file-picker">
+                <span>视频文件</span>
+                <input id="videoFileInput" type="file" accept="video/*" />
+              </label>
+              <div class="upload-actions">
+                <button id="analyzeVideoBtn" class="primary" type="button">开始识别</button>
+                <button id="resetVideoBtn" type="button">清空结果</button>
+              </div>
+              <div class="upload-progress">
+                <meter id="videoProgressMeter" min="0" max="100" value="0"></meter>
+                <strong id="videoProgressText">0%</strong>
+              </div>
+              <div class="video-result-grid">
+                <div>
+                  <span>状态</span>
+                  <strong id="videoStatusText">待上传</strong>
+                </div>
+                <div>
+                  <span>视频 HR</span>
+                  <strong id="videoHrText">--</strong>
+                </div>
+                <div>
+                  <span>SQI</span>
+                  <strong id="videoSqiText">--</strong>
+                </div>
+                <div>
+                  <span>帧数</span>
+                  <strong id="videoFramesText">--</strong>
+                </div>
+              </div>
+              <p id="videoAdvice" class="upload-advice">建议上传正脸、稳定补光、少压缩闪烁的视频；结果仅用于互动展示。</p>
+            </div>
+          </section>
+
+          <section class="highlight-card">
+            <div class="card-head compact">
+              <div>
+                <h2>高能 / 高光时刻</h2>
+                <p>基于实时心率波动自动选取连续片段，并在有本地录制时导出完整视频。</p>
+              </div>
+            </div>
+            <div class="highlight-panel">
+              <label class="toggle-row highlight-toggle">
+                <input id="recordingToggle" type="checkbox" />
+                <span>本地保存直播</span>
+              </label>
+              <div class="highlight-status-grid">
+                <div>
+                  <span>录制状态</span>
+                  <strong id="recordingStatusText">未开启</strong>
+                </div>
+                <div>
+                  <span>录制文件</span>
+                  <strong id="recordingFileText">--</strong>
+                </div>
+                <div>
+                  <span>高光数量</span>
+                  <strong id="highlightCountText">0</strong>
+                </div>
+                <div>
+                  <span>导出状态</span>
+                  <strong id="highlightExportText">等待录制文件</strong>
+                </div>
+              </div>
+              <div id="highlightList" class="highlight-list"></div>
+              <p id="highlightEmptyText" class="highlight-advice">等待连续心率波动后显示高能时间段。</p>
+            </div>
+          </section>
+        </div>
+
+        <aside class="status-column">
+          <section class="heart-card">
+            <div class="heart-orb" id="heartOrb">
+              <span id="bpmValue">--</span>
+              <small>BPM</small>
+            </div>
+            <div class="heart-copy">
+              <h2 id="heartTitle">等待采集</h2>
+              <p id="heartDescription">启动后端采集后，模型会先积累稳定 BVP/SQI 窗口。</p>
+              <div class="mini-stats">
+                <div>
+                  <span>置信度</span>
+                  <strong id="confidenceText">0%</strong>
+                </div>
+                <div>
+                  <span>模型 HR</span>
+                  <strong id="previewHrText">--</strong>
+                </div>
+                <div>
+                  <span>窗口</span>
+                  <strong id="windowText">0s</strong>
+                </div>
+                <div>
+                  <span>追踪</span>
+                  <strong id="trackerText">后端</strong>
+                </div>
+                <div>
+                  <span>模型</span>
+                  <strong id="modelText">检测中</strong>
+                </div>
+                <div>
+                  <span>输出</span>
+                  <strong id="outputText">锁定</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="agent-card">
+            <div class="card-head compact">
+              <div>
+                <h2>互动 Agent</h2>
+                <p>根据心率、补光和现场状态生成聊天回复与 OBS 字幕。</p>
+              </div>
+            </div>
+            <div class="agent-panel">
+              <div class="agent-status-grid">
+                <div>
+                  <span>互动模式</span>
+                  <strong id="agentModeText">本地自动播报</strong>
+                </div>
+                <div>
+                  <span>模型状态</span>
+                  <strong id="agentStatusText">未连接</strong>
+                </div>
+                <div>
+                  <span>当前字幕</span>
+                  <strong id="agentSubtitleText">暂无字幕</strong>
+                </div>
+              </div>
+
+              <details id="agentSettings" class="agent-settings">
+                <summary>外部 API 设置 <span>仅在开启时调用</span></summary>
+                <div class="agent-settings-grid">
+                  <label><span>协议</span><select id="agentProtocol"><option value="anthropic">Anthropic Compatible</option><option value="openai">OpenAI Compatible</option></select></label>
+                  <label><span>模型</span><input id="agentModel" value="bedrock-claude-haiku" autocomplete="off" /></label>
+                  <label class="wide"><span>Base URL</span><input id="agentBaseUrl" type="url" placeholder="https://api.example.com" autocomplete="url" /></label>
+                  <label class="wide"><span>API Key</span><input id="agentApiKey" type="password" placeholder="首次开启时必填；已保存则可留空" autocomplete="off" /></label>
+                </div>
+              </details>
+
+              <div id="agentMessages" class="agent-messages" aria-live="polite"></div>
+
+              <label class="agent-input-label">
+                <span>自由对话</span>
+                <textarea id="agentInput" maxlength="800" rows="3" placeholder="输入一条消息"></textarea>
+              </label>
+              <div class="agent-actions">
+                <button id="enableAgentBtn" class="primary" type="button">开启 API</button>
+                <button id="disableAgentBtn" type="button">关闭 API</button>
+                <button id="sendAgentBtn" class="primary" type="button">发送</button>
+                <button id="resetAgentBtn" type="button">清空</button>
+              </div>
+              <p id="agentErrorText" class="agent-error"></p>
+              <p class="agent-log">日志 <code id="agentLogPathText">--</code></p>
+            </div>
+          </section>
+
+          <div id="floatingHeartWidget" class="floating-heart-widget" title="拖动心跳小组件" aria-label="可拖动心跳小组件">
+            <span class="floating-heart-handle" aria-hidden="true"></span>
+            <div class="overlay-pulse floating-heart-pulse" aria-hidden="true">
+              <span class="heart-ring"></span>
+              <span class="heart-shape"></span>
+            </div>
+          </div>
+
+          <section class="perf-card">
+            <div class="card-head compact">
+              <div>
+                <h2>链路性能</h2>
+                <p>服务端采集、模型输入和直播输出状态。</p>
+              </div>
+            </div>
+            <div class="perf-grid">
+              <div>
+                <span>采集输入</span>
+                <strong id="cameraFpsText">--</strong>
+              </div>
+              <div>
+                <span>采集耗时</span>
+                <strong id="detectMsText">--</strong>
+              </div>
+              <div>
+                <span>服务帧数</span>
+                <strong id="cropMsText">--</strong>
+              </div>
+              <div>
+                <span>输出原因</span>
+                <strong id="requestMsText">--</strong>
+              </div>
+              <div>
+                <span>模型输入</span>
+                <strong id="modelInputFpsText">--</strong>
+              </div>
+              <div>
+                <span>模型更新</span>
+                <strong id="modelUpdateMsText">--</strong>
+              </div>
+              <div>
+                <span>HR 计算</span>
+                <strong id="modelMetricMsText">--</strong>
+              </div>
+              <div>
+                <span>无人脸/丢帧</span>
+                <strong id="dropText">0/0</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="light-card">
+            <div class="card-head compact">
+              <div>
+                <h2>补光策略</h2>
+                <p>开关只影响 OBS 摄像头源；右侧预览始终用于调整补光预设。</p>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="toggle-row">
+                <input id="lightToggle" type="checkbox" />
+                <span>应用补光到 OBS 输出</span>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label>
+                <span class="range-head">
+                  <span>亮度</span>
+                  <output id="brightnessValue">72%</output>
+                </span>
+                <input id="brightnessInput" type="range" min="20" max="100" value="72" />
+              </label>
+              <label>
+                <span class="range-head">
+                  <span>色温</span>
+                  <output id="temperatureValue">4800K</output>
+                </span>
+                <input id="temperatureInput" type="range" min="2700" max="6500" value="4800" />
+              </label>
+            </div>
+
+            <div class="control-group">
+              <div class="light-position-grid">
+                <label>
+                  <span class="range-head">
+                    <span>灯位 X</span>
+                    <output id="lightXValue">50%</output>
+                  </span>
+                  <input id="lightXInput" type="range" min="0" max="100" value="50" />
+                </label>
+                <label>
+                  <span class="range-head">
+                    <span>灯位 Y</span>
+                    <output id="lightYValue">38%</output>
+                  </span>
+                  <input id="lightYInput" type="range" min="0" max="100" value="38" />
+                </label>
+              </div>
+              <label>
+                <span class="range-head">
+                  <span>灯距 Z</span>
+                  <output id="lightZValue">45%</output>
+                </span>
+                <input id="lightZInput" type="range" min="0" max="100" value="45" />
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label>
+                <span class="range-head">
+                  <span>照射范围</span>
+                  <output id="lightRangeValue">58%</output>
+                </span>
+                <input id="lightRangeInput" type="range" min="15" max="120" value="58" />
+              </label>
+              <label class="toggle-row">
+                <input id="angleToggle" type="checkbox" />
+                <span>启用角度测试</span>
+              </label>
+              <label>
+                <span class="range-head">
+                  <span>光束角度</span>
+                  <output id="lightAngleValue">0°</output>
+                </span>
+                <input id="lightAngleInput" type="range" min="-75" max="75" value="0" />
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label class="toggle-row">
+                <input id="pulseToggle" type="checkbox" checked />
+                <span>Overlay 跟随心跳轻微脉动</span>
+              </label>
+            </div>
+
+            <div id="lightAdvice" class="light-advice">建议：先保持柔和稳定补光，避免自动曝光剧烈变化。</div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="app.js?v=20260719-live-v4"></script>
+  </body>
+</html>

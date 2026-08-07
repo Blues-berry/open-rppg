@@ -1,0 +1,99 @@
+@media (max-width: 1120px) {
+  .topbar,
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-state {
+    order: 3;
+  }
+
+  .status-column {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 900px) {
+  .preview-stream-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .telemetry-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .highlight-status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .agent-subtitle {
+    right: 24px;
+    left: 24px;
+    bottom: 150px;
+    max-width: none;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .plugin-shell {
+    width: min(100% - 18px, 1540px);
+    padding-top: 10px;
+  }
+
+  .floating-heart-widget {
+    top: 76px;
+    right: 16px;
+    width: 86px;
+  }
+
+  .floating-heart-pulse {
+    width: 60px;
+  }
+
+  .topbar-actions,
+  .controls,
+  .upload-actions,
+  .agent-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  button,
+  .link-button {
+    justify-content: center;
+    min-width: 0;
+    padding: 0 8px;
+  }
+
+  .heart-card {
+    grid-template-columns: 1fr;
+  }
+
+  .heart-orb {
+    justify-self: center;
+  }
+
+  .mini-stats,
+  .quality-grid,
+  .telemetry-grid,
+  .video-result-grid,
+  .highlight-status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .highlight-item {
+    grid-template-columns: 1fr;
+  }
+
+  .highlight-action {
+    width: 100%;
+  }
+
+  .overlay-widget {
+    left: 18px;
+    bottom: 18px;
+  }
+}

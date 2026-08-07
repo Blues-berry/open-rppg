@@ -1,0 +1,143 @@
+.light-card {
+  padding-bottom: 12px;
+}
+
+.control-group {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.control-group:first-of-type {
+  border-top: 0;
+}
+
+.light-card label,
+.file-picker {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.light-card input[type="range"] {
+  width: 100%;
+}
+
+.light-card input[type="range"]:disabled {
+  opacity: 0.42;
+}
+
+.light-position-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.range-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.range-head output {
+  color: #f6f4ed;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.toggle-row {
+  display: flex !important;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-row input {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.light-advice,
+.upload-advice {
+  margin: 12px 14px 0;
+  padding: 10px;
+  border: 1px solid rgba(85, 210, 176, 0.35);
+  border-radius: 8px;
+  background: rgba(85, 210, 176, 0.08);
+  color: #d7f6ec;
+  font-size: 0.82rem;
+  line-height: 1.48;
+}
+
+#waveCanvas {
+  display: block;
+  width: 100%;
+  height: 220px;
+}
+
+.output-telemetry-panel #waveCanvas {
+  height: 180px;
+}
+
+meter {
+  width: 100%;
+  height: 8px;
+  margin-top: 8px;
+}
+
+meter::-webkit-meter-bar {
+  border: 0;
+  border-radius: 999px;
+  background: #2d353a;
+}
+
+meter::-webkit-meter-optimum-value {
+  border-radius: 999px;
+  background: var(--teal);
+}
+
+#overlayPreview {
+  display: block;
+  width: 100%;
+  height: 260px;
+  border: 0;
+  background:
+    linear-gradient(135deg, rgba(116, 169, 255, 0.14), transparent),
+    #0b0e10;
+}
+
+.upload-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.file-picker input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-3);
+  color: var(--text);
+}
+
+.upload-actions button {
+  flex: 1 1 150px;
+}
+
+.upload-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  gap: 10px;
+  align-items: center;
+}
+.video-result-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}

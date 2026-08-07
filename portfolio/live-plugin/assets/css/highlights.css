@@ -1,0 +1,101 @@
+.highlight-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  background: var(--panel-3);
+}
+
+.highlight-toggle {
+  padding: 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text);
+}
+
+.highlight-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.highlight-status-grid div {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.highlight-status-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.highlight-status-grid strong {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.highlight-list {
+  display: grid;
+  gap: 8px;
+}
+
+.highlight-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.highlight-item.observing {
+  border-color: rgba(245, 193, 91, 0.54);
+  background: rgba(245, 193, 91, 0.075);
+}
+
+.highlight-item.high.confirmed {
+  border-color: rgba(255, 107, 131, 0.46);
+  background: rgba(255, 107, 131, 0.07);
+}
+
+.highlight-main {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.highlight-main strong {
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.highlight-main span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.highlight-action {
+  min-width: 104px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.highlight-advice {
+  margin: 0;
+  padding: 10px;
+  border: 1px solid rgba(245, 193, 91, 0.35);
+  border-radius: 8px;
+  background: rgba(245, 193, 91, 0.08);
+  color: #fff0c8;
+  font-size: 0.82rem;
+  line-height: 1.48;
+}
