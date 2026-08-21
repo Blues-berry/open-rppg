@@ -41,7 +41,7 @@
             <div class="card-head">
               <div>
                 <h2>浏览器摄像头预览</h2>
-                <p id="captureHint">启动后仅在当前浏览器读取摄像头；线上指标为 Vercel 模拟分析，不上传视频。</p>
+                <p id="captureHint">开启摄像头 → 允许摄像头后，系统将在本机完成人脸定位与信号校准。</p>
               </div>
             </div>
 
@@ -83,7 +83,7 @@
             <div class="output-telemetry-panel">
               <div class="preview-strip-head telemetry-head">
                 <span>心率波形 / 参考数据</span>
-                <small>模拟波形，近 10 秒</small>
+                <small>本地 BVP，近 10 秒</small>
               </div>
               <canvas id="waveCanvas" width="1280" height="220"></canvas>
               <div class="telemetry-grid">
@@ -234,7 +234,7 @@
             </div>
             <div class="heart-copy">
               <h2 id="heartTitle">等待采集</h2>
-              <p id="heartDescription">启动后端采集后，模型会先积累稳定 BVP/SQI 窗口。</p>
+              <p id="heartDescription">开启摄像头 → 允许摄像头后，系统将在本机完成人脸定位与信号校准。</p>
               <div class="mini-stats">
                 <div>
                   <span>置信度</span>

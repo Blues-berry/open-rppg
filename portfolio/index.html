@@ -115,11 +115,11 @@
       </section>
 
       <section class="live-plugin container" id="live-plugin">
-        <div class="section-heading"><div><p class="eyebrow"><span></span> LIVE HEART LIGHT PLUGIN</p><h2>把脉搏带进<br />直播画面</h2></div><p>直播插件把摄像头源、FacePhys 信号、补光控制与 OBS Overlay 收进同一块控制台。下面是已部署的网页界面；真实摄像头采集需要在本机启动插件服务。</p></div>
+        <div class="section-heading"><div><p class="eyebrow"><span></span> LOCAL HEART LIGHT STUDIO</p><h2>把脉搏带进<br />直播画面</h2></div><p>控制台把浏览器摄像头、FacePhys 信号和补光预览收进同一界面。人脸定位与信号校准只在当前设备完成，不需要启动后端服务。</p></div>
         <div class="live-plugin-card">
           <div class="live-plugin-head"><div><span class="live-plugin-kicker">OBS + B站 · CONTROL ROOM</span><h3>直播心率补光控制台</h3></div><span class="live-plugin-state"><i></i> WEB PREVIEW</span></div>
           <div class="live-plugin-grid">
-            <div class="live-plugin-copy"><p>从本地摄像头采集开始，经过 FacePhys 推理，再把 BPM、SQI 与高光状态输出到直播 Overlay。网页预览不会请求摄像头，也不会上传视频。</p><div class="live-plugin-stats"><div><b>72</b><span>BPM · DEMO</span></div><div><b>0.82</b><span>SQI · DEMO</span></div><div><b>15s</b><span>WINDOW</span></div></div><div class="live-plugin-actions"><a class="button primary" href="live-plugin/index.html" target="_blank" rel="noopener noreferrer">打开完整控制台 <span>↗</span></a><a class="button quiet" href="live-plugin/overlay.html" target="_blank" rel="noopener noreferrer">查看 Overlay <span>↗</span></a></div><p class="live-plugin-note">接入 OBS 时使用“摄像头源”和“Overlay”两个独立地址；生产网页仅承载界面，采集与模型仍留在本机。</p></div>
+            <div class="live-plugin-copy"><p>允许摄像头后，FacePhys 会在浏览器本机定位人脸、积累 BVP/SQI 窗口；补光参数直接作用于本地预览，不上传任何视频帧。</p><div class="live-plugin-stats"><div><b>LOCAL</b><span>FACEPHYS</span></div><div><b>15s</b><span>WINDOW</span></div><div><b>0↑</b><span>FRAMES UPLOADED</span></div></div><div class="live-plugin-actions"><a class="button primary" href="live-plugin/index.html" target="_blank" rel="noopener noreferrer">打开本地控制台 <span>↗</span></a></div><p class="live-plugin-note">该页面不再依赖直播后端、OBS 摄像头源或服务端 Overlay；补光和监测均只在当前浏览器处理。</p></div>
             <div class="live-plugin-preview" aria-label="直播控制台网页预览"><iframe src="live-plugin/index.html?preview=1" title="直播心率补光控制台预览" loading="lazy"></iframe><div class="live-plugin-overlay"><span>LIVE HEART</span><strong>72<small>BPM</small></strong><em>signal locked</em></div></div>
           </div>
         </div>

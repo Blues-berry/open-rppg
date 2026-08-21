@@ -15,6 +15,7 @@ import {
   VIDEO_POLL_INTERVAL_MS,
 } from "./config.js?v=20260719-live-v4";
 import { apiJson } from "./api.js?v=20260719-live-v4";
+import { LocalFacePhysCapture } from "./local-facephys.js?v=20260821-local-v1";
 import {
   checkedValue,
   hideBanner,
@@ -50,7 +51,8 @@ import {
 } from "./format.js?v=20260719-live-v4";
 
 const waveCtx = ui.waveCanvas?.getContext("2d") || null;
-const isHostedShowcase = window.location.protocol === "https:" && !["localhost", "127.0.0.1"].includes(window.location.hostname);
+// This control room is deliberately browser-local in every environment.
+const isHostedShowcase = true;
 
 const state = {
   overlay: null,
@@ -74,14 +76,13 @@ const state = {
   highlightExportingId: null,
   hostedRunning: false,
   hostedStream: null,
+  localCapture: null,
 };
 
 async function hostedRequest(action, settings = readOverlaySettingsFromControls()) {
-  const response = await apiJson("/api/live-plugin", {
-    method: "POST",
-    body: JSON.stringify({ action, running: state.hostedRunning, settings }),
-  });
-  return normalizeSnapshot(response.snapshot || {});
+  state.localCapture.settings = settings;
+  if (action === "reset") state.localCapture.reset();
+  return normalizeSnapshot(state.localCapture.snapshot(settings));
 }
 
 function applyHostedPreview(settings = {}) {
@@ -100,14 +101,15 @@ async function startHostedCapture() {
   setStatePill("REQUESTING", "warn");
   setText(ui.captureHint, "正在请求浏览器摄像头权限；画面不会上传到 Vercel。");
   try {
-    state.hostedStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }, audio: false });
+    await state.localCapture.start();
+    state.hostedStream = state.localCapture.stream;
     state.hostedRunning = true;
     const snapshot = await hostedRequest("start");
     state.overlay = snapshot;
     updateHistory(snapshot);
     renderDashboard(snapshot);
     applyHostedPreview(snapshot.settings);
-    showBanner(ui.backendWarning, "浏览器预览已开启；心率、SQI 与 FacePhys 状态均为 Vercel 返回的模拟数据。", "warn");
+    showBanner(ui.backendWarning, "本地 FacePhys 已启动：摄像头画面、定位与信号计算均在当前浏览器完成，不上传视频。", "warn");
   } catch (error) {
     state.hostedRunning = false;
     setStatePill("CAMERA BLOCKED", "bad");
@@ -117,13 +119,13 @@ async function startHostedCapture() {
 
 async function stopHostedCapture() {
   state.hostedRunning = false;
-  state.hostedStream?.getTracks().forEach((track) => track.stop());
+  state.localCapture?.stop();
   state.hostedStream = null;
   const snapshot = await hostedRequest("stop");
   state.overlay = snapshot;
   renderDashboard(snapshot);
   applyHostedPreview(snapshot.settings);
-  setText(ui.captureHint, "浏览器摄像头已停止；模拟服务保持待机。");
+  setText(ui.captureHint, "浏览器摄像头已停止；本地 FacePhys 已待机。");
 }
 
 
@@ -827,7 +829,7 @@ function hasLightBackend(settings = {}) {
 
 function updateLightBackendWarning(settings = {}) {
   if (isHostedShowcase) {
-    showBanner(ui.backendWarning, "浏览器摄像头预览 · Vercel 模拟分析：不上传视频，不运行真实 FacePhys 或 OBS 输出。", "warn");
+    showBanner(ui.backendWarning, "浏览器本地模式：FacePhys 与补光预览均在当前设备运行，不使用服务器后端。", "warn");
     return true;
   }
   const settingsReady = hasLightBackend(settings);
@@ -1100,7 +1102,7 @@ function renderHeart(capture, model, output) {
   setText(ui.confidenceText, `${confidencePct}%`);
   setText(ui.previewHrText, previewBpm == null ? "--" : formatBpm(previewBpm));
   setText(ui.windowText, `${Math.round(windowSeconds)}s`);
-  setText(ui.trackerText, captureRunning ? "后端 BlazeFace" : "待机");
+  setText(ui.trackerText, captureRunning ? (isHostedShowcase ? "本地 FaceTracker" : "后端 BlazeFace") : "待机");
   setText(ui.modelText, model.ready ? model.model || "Open-rppg" : model.state || "loading");
   setText(ui.outputText, formatOutputStatus(output.status, bpm != null));
 
@@ -1143,6 +1145,22 @@ function renderOutputTelemetry(model, output) {
 }
 
 function renderStateCopy(capture, model, output) {
+  if (isHostedShowcase) {
+    if (capture.state !== "running") {
+      setText(ui.heartTitle, "等待开始");
+      setText(ui.heartDescription, "开启摄像头 → 允许摄像头后，系统将在本机完成人脸定位与信号校准。");
+      setText(ui.captureHint, "开启摄像头 → 允许摄像头后，系统将在本机完成人脸定位与信号校准。");
+    } else if (!model.has_face) {
+      setText(ui.heartTitle, "正在寻找人脸");
+      setText(ui.heartDescription, "请正对镜头并保持居中，让面部光线尽量均匀。");
+      setText(ui.captureHint, "本地 FaceTracker 正在定位人脸；视频帧不会离开浏览器。");
+    } else {
+      setText(ui.heartTitle, output.status === "stable" ? "本地信号稳定" : "正在校准信号");
+      setText(ui.heartDescription, "FacePhys 正在本机积累 BVP/SQI 窗口。");
+      setText(ui.captureHint, "本地 FacePhys 推理运行中；请保持正脸、稳定光线和轻微动作。");
+    }
+    return;
+  }
   const previewBpm = Number.isFinite(model.hr) ? `${Math.round(model.hr)} BPM，` : "";
   if (capture.state === "camera_error") {
     setText(ui.heartTitle, "摄像头不可用");
@@ -1237,6 +1255,12 @@ function renderControls(captureRunning, captureState) {
 }
 
 function renderLightAdvice(capture, model, output, settings = {}) {
+  if (isHostedShowcase) {
+    setText(ui.lightAdvice, settings.light_enabled
+      ? "补光预览已应用到右侧浏览器画面；拖动预览或调整参数即可改变本地视觉效果。"
+      : "补光预览关闭中；开启后可在右侧画面直接调整灯位和亮度。 ");
+    return;
+  }
   if (capture.state !== "running") {
     setText(ui.lightAdvice, "建议：先启动后端采集，再在 OBS 添加摄像头源和 Overlay。");
   } else if (!settings.light_enabled) {
@@ -1372,6 +1396,15 @@ function init() {
 }
 
 function initHostedSimulation() {
+  state.localCapture = new LocalFacePhysCapture((snapshot) => {
+    state.overlay = normalizeSnapshot(snapshot);
+    updateHistory(state.overlay);
+    renderDashboard(state.overlay);
+    applyHostedPreview(state.overlay.settings);
+  }, (error) => {
+    setStatePill("LOCAL ERROR", "bad");
+    setText(ui.captureHint, `本地 FacePhys 已停止：${error.message}`);
+  });
   on(ui.startBtn, "click", startCapture);
   on(ui.stopBtn, "click", stopCapture);
   on(ui.resetBtn, "click", resetModel);
@@ -1383,8 +1416,8 @@ function initHostedSimulation() {
     .forEach((control) => setDisabled(control, true));
   setText(ui.videoAdvice, "线上演示不上传或分析视频文件。");
   setText(ui.agentErrorText, "线上演示未启用 Agent 服务。");
-  setText(ui.captureHint, "点击“启动采集”后可使用浏览器摄像头预览；分析数据为模拟结果。 ");
-  showBanner(ui.backendWarning, "线上模式：摄像头画面只保留在浏览器。Vercel 仅确认模拟控制状态，不接收视频帧。", "warn");
+  setText(ui.captureHint, "开启摄像头 → 允许摄像头后，系统将在本机完成人脸定位与信号校准。");
+  showBanner(ui.backendWarning, "本地模式：摄像头、FacePhys 与补光预览都只在当前浏览器运行。", "warn");
   pollState(true);
   window.setInterval(() => pollState(false), POLL_INTERVAL_MS);
 }
