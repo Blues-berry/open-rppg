@@ -1,8 +1,10 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/live-plugin", "destination": "/#live-plugin", "permanent": true },
+    { "source": "/live-plugin/:path*", "destination": "/#live-plugin", "permanent": true }
+  ],
   "rewrites": [
-    { "source": "/live-plugin", "destination": "/portfolio/live-plugin/index.html" },
-    { "source": "/live-plugin/:path*", "destination": "/portfolio/live-plugin/:path*" },
     { "source": "/", "destination": "/portfolio/index.html" },
     { "source": "/:path*", "destination": "/portfolio/:path*" }
   ],

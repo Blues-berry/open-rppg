@@ -103,6 +103,10 @@ html{background:var(--bg)}
 @media (max-width:900px){.live-plugin-grid{grid-template-columns:1fr}.live-plugin-preview{min-height:360px}.live-plugin-preview iframe{height:470px}}
 @media (max-width:520px){.live-plugin-head{align-items:flex-start;flex-direction:column}.live-plugin-grid{padding:.8rem}.live-plugin-copy{padding:.7rem}.live-plugin-stats{gap:.45rem}.live-plugin-stats div{padding:.6rem}.live-plugin-preview iframe{height:430px}}
 
+.live-plugin-static-card{margin:0;overflow:hidden;border:1px solid rgba(151,255,219,.18);border-radius:24px;background:rgba(10,20,22,.72);box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.live-plugin-static-card img{display:block;width:100%;height:auto;max-height:620px;object-fit:contain;background:#f7fbff}
+.live-plugin-static-card figcaption{padding:13px 18px;color:#8ea9a3;font:600 11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+
 /* Make the top-level project signals readable at a glance. */
 .hero-art .art-bottom small{font-size:clamp(9px,.76vw,11px)}
 .hero-art .art-bottom b{font-size:clamp(14px,1.25vw,18px);line-height:1.1}
