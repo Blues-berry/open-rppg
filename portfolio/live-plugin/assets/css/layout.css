@@ -175,6 +175,12 @@
   object-fit: cover;
 }
 
+#pairedLightPreview {
+  filter: brightness(var(--sim-light-brightness, 1)) sepia(var(--sim-light-warmth, 0));
+  transform: scale(var(--sim-light-zoom, 1));
+  transition: filter 140ms ease, transform 140ms ease;
+}
+
 .output-telemetry-panel {
   border-top: 1px solid var(--line);
   background: var(--panel-3);

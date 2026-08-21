@@ -40,8 +40,8 @@
           <section class="camera-card">
             <div class="card-head">
               <div>
-                <h2>后端摄像头采集</h2>
-                <p id="captureHint">服务端会独立打开摄像头并持续推理；这个页面关闭后采集仍会继续。</p>
+                <h2>浏览器摄像头预览</h2>
+                <p id="captureHint">启动后仅在当前浏览器读取摄像头；线上指标为 Vercel 模拟分析，不上传视频。</p>
               </div>
             </div>
 
@@ -57,12 +57,11 @@
                     <small>跟随补光开关</small>
                   </div>
                   <div class="preview-stage">
-                    <img
+                    <video
                       id="currentOutputPreview"
-                      alt="Current OBS camera output preview"
-                      src="/api/capture/preview.mjpg"
-                      data-src="/api/capture/preview.mjpg"
-                    />
+                      aria-label="Current browser camera preview"
+                      autoplay muted playsinline
+                    ></video>
                   </div>
                 </div>
                 <div id="lightPreviewStream" class="preview-stream" hidden aria-hidden="true">
@@ -71,11 +70,11 @@
                     <small>拖动调整灯位</small>
                   </div>
                   <div id="pairedPreviewStage" class="paired-preview-stage preview-stage">
-                    <img
+                    <video
                       id="pairedLightPreview"
-                      alt="Virtual fill light preview"
-                      data-src="/api/capture/light-preview.mjpg"
-                    />
+                      aria-label="Virtual fill light preview"
+                      autoplay muted playsinline
+                    ></video>
                   </div>
                 </div>
               </div>
@@ -84,7 +83,7 @@
             <div class="output-telemetry-panel">
               <div class="preview-strip-head telemetry-head">
                 <span>心率波形 / 参考数据</span>
-                <small>真实 BVP，近 10 秒</small>
+                <small>模拟波形，近 10 秒</small>
               </div>
               <canvas id="waveCanvas" width="1280" height="220"></canvas>
               <div class="telemetry-grid">

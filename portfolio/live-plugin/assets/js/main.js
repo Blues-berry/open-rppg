@@ -72,7 +72,59 @@ const state = {
   heartbeatTimer: null,
   heartbeatBpm: null,
   highlightExportingId: null,
+  hostedRunning: false,
+  hostedStream: null,
 };
+
+async function hostedRequest(action, settings = readOverlaySettingsFromControls()) {
+  const response = await apiJson("/api/live-plugin", {
+    method: "POST",
+    body: JSON.stringify({ action, running: state.hostedRunning, settings }),
+  });
+  return normalizeSnapshot(response.snapshot || {});
+}
+
+function applyHostedPreview(settings = {}) {
+  [ui.currentOutputPreview, ui.pairedLightPreview].forEach((preview) => {
+    if (preview && "srcObject" in preview) preview.srcObject = state.hostedStream;
+  });
+  if (ui.pairedLightPreview) {
+    const brightness = settings.light_enabled ? 1 + Number(settings.brightness || 72) / 260 : 1;
+    ui.pairedLightPreview.style.setProperty("--sim-light-brightness", String(brightness));
+    ui.pairedLightPreview.style.setProperty("--sim-light-warmth", settings.light_enabled ? String(Math.max(0, (Number(settings.temperature || 4800) - 3500) / 5000)) : "0");
+    ui.pairedLightPreview.style.setProperty("--sim-light-zoom", settings.light_enabled ? String(1 + Number(settings.light_range || 58) / 1800) : "1");
+  }
+}
+
+async function startHostedCapture() {
+  setStatePill("REQUESTING", "warn");
+  setText(ui.captureHint, "正在请求浏览器摄像头权限；画面不会上传到 Vercel。");
+  try {
+    state.hostedStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }, audio: false });
+    state.hostedRunning = true;
+    const snapshot = await hostedRequest("start");
+    state.overlay = snapshot;
+    updateHistory(snapshot);
+    renderDashboard(snapshot);
+    applyHostedPreview(snapshot.settings);
+    showBanner(ui.backendWarning, "浏览器预览已开启；心率、SQI 与 FacePhys 状态均为 Vercel 返回的模拟数据。", "warn");
+  } catch (error) {
+    state.hostedRunning = false;
+    setStatePill("CAMERA BLOCKED", "bad");
+    setText(ui.captureHint, `未取得摄像头权限：${error.message}`);
+  }
+}
+
+async function stopHostedCapture() {
+  state.hostedRunning = false;
+  state.hostedStream?.getTracks().forEach((track) => track.stop());
+  state.hostedStream = null;
+  const snapshot = await hostedRequest("stop");
+  state.overlay = snapshot;
+  renderDashboard(snapshot);
+  applyHostedPreview(snapshot.settings);
+  setText(ui.captureHint, "浏览器摄像头已停止；模拟服务保持待机。");
+}
 
 
 function hrWindowSeconds(model = {}) {
@@ -107,6 +159,7 @@ function displayBpmFromOutput(capture, output) {
 }
 
 async function startCapture() {
+  if (isHostedShowcase) return startHostedCapture();
   setStatePill("STARTING", "warn");
   setText(ui.captureHint, "正在启动后端摄像头采集和 Open-rppg 模型。");
   try {
@@ -122,6 +175,7 @@ async function startCapture() {
 }
 
 async function stopCapture() {
+  if (isHostedShowcase) return stopHostedCapture();
   setStatePill("STOPPING", "warn");
   setText(ui.captureHint, "正在停止后端采集并清空直播输出。");
   try {
@@ -134,6 +188,13 @@ async function stopCapture() {
 }
 
 async function resetModel() {
+  if (isHostedShowcase) {
+    state.history = [];
+    const snapshot = await hostedRequest("reset");
+    state.overlay = snapshot;
+    renderDashboard(snapshot);
+    return;
+  }
   try {
     await apiJson(`${MODEL_API}/reset`, { method: "POST", body: "{}" });
     state.history = [];
@@ -344,6 +405,17 @@ async function pushOverlaySettings() {
   const writeSeq = state.settingsWriteSeq;
   const desiredSettings = { ...(state.pendingOverlaySettings || readOverlaySettingsFromControls()) };
   try {
+    if (isHostedShowcase) {
+      const snapshot = await hostedRequest("settings", desiredSettings);
+      state.overlay = snapshot;
+      state.lightBackendReady = true;
+      state.pendingOverlaySettings = null;
+      state.localSettingsUntil = performance.now() + 250;
+      applyOverlaySettingsToControls(snapshot.settings);
+      applyHostedPreview(snapshot.settings);
+      updateLightValueText();
+      return;
+    }
     const settings = await apiJson(`${OVERLAY_API}/settings`, {
       method: "POST",
       body: JSON.stringify(desiredSettings),
@@ -389,7 +461,9 @@ async function pollState(force = false) {
 
   let snapshot;
   try {
-    snapshot = await apiJson(`${OVERLAY_API}/state`);
+    snapshot = isHostedShowcase
+      ? await hostedRequest("state")
+      : await apiJson(`${OVERLAY_API}/state`);
   } catch (error) {
     renderOffline(error);
     return;
@@ -752,6 +826,10 @@ function hasLightBackend(settings = {}) {
 }
 
 function updateLightBackendWarning(settings = {}) {
+  if (isHostedShowcase) {
+    showBanner(ui.backendWarning, "浏览器摄像头预览 · Vercel 模拟分析：不上传视频，不运行真实 FacePhys 或 OBS 输出。", "warn");
+    return true;
+  }
   const settingsReady = hasLightBackend(settings);
   state.lightBackendReady = settingsReady;
   if (!settingsReady) {
@@ -1244,7 +1322,7 @@ function drawWave() {
 function init() {
   validateDom();
   if (isHostedShowcase) {
-    renderHostedShowcase();
+    initHostedSimulation();
     return;
   }
   on(ui.startBtn, "click", startCapture);
@@ -1291,6 +1369,24 @@ function init() {
   pollVideoStatus(true);
   window.setInterval(() => pollState(false), POLL_INTERVAL_MS);
   window.setInterval(() => pollVideoStatus(false), VIDEO_POLL_INTERVAL_MS);
+}
+
+function initHostedSimulation() {
+  on(ui.startBtn, "click", startCapture);
+  on(ui.stopBtn, "click", stopCapture);
+  on(ui.resetBtn, "click", resetModel);
+  [ui.lightToggle, ui.brightnessInput, ui.temperatureInput, ui.lightXInput, ui.lightYInput, ui.lightZInput, ui.lightRangeInput, ui.angleToggle, ui.lightAngleInput, ui.pulseToggle]
+    .forEach((input) => on(input, "input", scheduleOverlaySettings));
+  enablePairedLightDrag();
+  updateLightValueText();
+  [ui.analyzeVideoBtn, ui.resetVideoBtn, ui.recordingToggle, ui.sendAgentBtn, ui.resetAgentBtn, ui.enableAgentBtn, ui.disableAgentBtn]
+    .forEach((control) => setDisabled(control, true));
+  setText(ui.videoAdvice, "线上演示不上传或分析视频文件。");
+  setText(ui.agentErrorText, "线上演示未启用 Agent 服务。");
+  setText(ui.captureHint, "点击“启动采集”后可使用浏览器摄像头预览；分析数据为模拟结果。 ");
+  showBanner(ui.backendWarning, "线上模式：摄像头画面只保留在浏览器。Vercel 仅确认模拟控制状态，不接收视频帧。", "warn");
+  pollState(true);
+  window.setInterval(() => pollState(false), POLL_INTERVAL_MS);
 }
 
 init();
