@@ -4,17 +4,31 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>rPPG Camera Source</title>
+    <script>
+      if (location.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(location.hostname)) {
+        const base = document.createElement('base');
+        base.href = '/live-plugin/';
+        document.head.append(base);
+      }
+    </script>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="camera-source-body">
-    <img id="obsCameraSource" alt="rPPG camera source" src="/api/capture/preview.mjpg" />
+    <img id="obsCameraSource" alt="rPPG camera source" />
     <script>
       const source = document.getElementById("obsCameraSource");
-      source.addEventListener("error", () => {
-        window.setTimeout(() => {
-          source.src = `/api/capture/preview.mjpg?t=${Date.now()}`;
-        }, 1000);
-      });
+      const hostedShowcase = location.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(location.hostname);
+      if (hostedShowcase) {
+        const artwork = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"><rect width="1280" height="720" fill="#0b1214"/><path d="M0 390 C120 270 210 490 330 380 S550 270 670 390 S890 480 1010 360 S1170 300 1280 390" fill="none" stroke="#55d2b0" stroke-width="8"/><text x="58" y="80" fill="#e8f4ef" font-family="system-ui" font-size="28" letter-spacing="6">CAMERA SOURCE SHOWCASE</text><text x="58" y="122" fill="#82a79c" font-family="system-ui" font-size="20">ONLINE VISUAL PREVIEW · NO CAMERA REQUEST</text></svg>`;
+        source.src = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(artwork)}`;
+      } else {
+        source.src = "/api/capture/preview.mjpg";
+        source.addEventListener("error", () => {
+          window.setTimeout(() => {
+            source.src = `/api/capture/preview.mjpg?t=${Date.now()}`;
+          }, 1000);
+        });
+      }
     </script>
   </body>
 </html>

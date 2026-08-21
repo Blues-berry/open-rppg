@@ -1,6 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/live-plugin", "destination": "/demo/live-heart-light-plugin/index.html" },
+    { "source": "/live-plugin/:path*", "destination": "/demo/live-heart-light-plugin/:path*" },
     { "source": "/", "destination": "/portfolio/index.html" },
     { "source": "/:path*", "destination": "/portfolio/:path*" }
   ],

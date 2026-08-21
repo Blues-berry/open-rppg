@@ -1,4 +1,5 @@
 const OVERLAY_STATE_URL = "/api/overlay/state";
+const isHostedShowcase = window.location.protocol === "https:" && !["localhost", "127.0.0.1"].includes(window.location.hostname);
 
 const ui = {
   widget: document.getElementById("overlayWidget"),
@@ -70,5 +71,10 @@ async function render() {
   }
 }
 
-window.setInterval(render, 500);
-render();
+if (isHostedShowcase) {
+  renderState({ output: { bpm: 72, confidence: 0.82, status: "stable" }, settings: { pulse: true }, agent: {} });
+  ui.status.textContent = "界面展示";
+} else {
+  window.setInterval(render, 500);
+  render();
+}

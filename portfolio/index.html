@@ -13,7 +13,7 @@
     <header class="nav container">
       <a class="brand" href="#top" aria-label="Open-rPPG 首页"><span class="brand-mark">∿</span>OPEN-RPPG</a>
       <nav aria-label="站内导航">
-        <a href="#experience">在线体验</a><a href="#live-plugin">直播控制台</a><a href="#system">核心能力</a><a href="#materials">项目材料</a><a href="#workflow">运行方式</a>
+        <a href="#experience">在线体验</a><a href="#live-plugin">直播控制台</a><a href="#system">核心能力</a><a href="#materials">项目材料</a><a href="#workflow">运行方式</a><a href="https://chexueyuan.vercel.app/#project-directory">返回项目目录</a>
       </nav>
       <a class="nav-cta" href="#experience">立即体验 <span>↗</span></a>
     </header>
@@ -24,7 +24,7 @@
         <div class="hero-copy">
           <p class="eyebrow"><span></span> LOCAL PULSE LAB · FACEPHYS</p>
           <h1>让每一帧<br /><em>显露心迹</em></h1>
-          <p class="lead">以普通摄像头捕捉面部微弱色彩变化，在本机完成 FacePhys 推理，让脉搏、信号质量与直播画面自然连接。</p>
+          <p class="lead">以普通摄像头捕捉面部微弱色彩变化，在本机完成 FacePhys 推理，让脉搏与信号质量在浏览器内清晰呈现。</p>
           <div class="hero-actions">
             <a class="button primary" href="#experience">体验本地测量 <span>↓</span></a>
             <a class="button quiet" href="#system">浏览核心能力 <span>→</span></a>
@@ -42,7 +42,7 @@
       <section class="metrics container" aria-label="项目能力">
         <div><b>01</b><span>本地人脸<br />稳定追踪</span></div>
         <div><b>02</b><span>FacePhys<br />时序推理</span></div>
-        <div><b>03</b><span>OBS 直播<br />即时呈现</span></div>
+        <div><b>03</b><span>信号波形<br />即时呈现</span></div>
         <div><b>04</b><span>隐私优先<br />零帧上传</span></div>
       </section>
 
@@ -104,12 +104,12 @@
       </section>
 
       <section class="system container" id="system">
-        <div class="section-heading"><div><p class="eyebrow"><span></span> COMPLETE WORKFLOW</p><h2>完美接入<br />直播互动</h2></div><p>本地服务负责连续采集与模型推理，直播控制台负责状态呈现、OBS 接入和互动管理，各环节清晰协作。</p></div>
+        <div class="section-heading"><div><p class="eyebrow"><span></span> COMPLETE WORKFLOW</p><h2>实时信号<br />清晰呈现</h2></div><p>浏览器在本机完成连续采集与模型推理，并将脉率、信号质量、频谱和采样状态即时呈现，让每一步都清晰可见。</p></div>
         <div class="pipeline">
           <article tabindex="0"><span>01</span><div class="icon">◉</div><h3>稳定采集</h3><p>本地服务持续接管摄像头，减少切页与后台运行造成的帧率波动。</p></article>
           <article tabindex="0"><span>02</span><div class="icon">⌁</div><h3>时序推理</h3><p>从人脸定位到 FacePhys 推理，持续生成脉率与信号质量。</p></article>
           <article tabindex="0"><span>03</span><div class="icon">⌇</div><h3>可信门控</h3><p>条件不足时立即清空旧读数，让每个状态真实、可解释。</p></article>
-          <article tabindex="0"><span>04</span><div class="icon">↗</div><h3>直播呈现</h3><p>心率 Overlay、录制和高光片段，在 OBS 工作流中顺畅衔接。</p></article>
+          <article tabindex="0"><span>04</span><div class="icon">↗</div><h3>结果呈现</h3><p>脉率、SQI、波形与频谱在浏览器内即时更新，方便观察每一次采样的状态。</p></article>
           <span class="pipeline-focus" aria-hidden="true"></span>
         </div>
       </section>
@@ -155,7 +155,7 @@
         </div>
       </section>
 
-      <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAPTURE<small>本地视频帧</small></div><i>→</i><div>FACEPHYS<small>Pulse / SQI</small></div><i>→</i><div>OUTPUT<small>OBS / Web</small></div></div><p>网站由 Vercel 提供静态资源，摄像头画面与模型推理始终留在设备本地。体验更直接，隐私边界也更清晰。</p></div></section>
+      <section class="workflow container" id="workflow"><div class="workflow-card"><p class="eyebrow"><span></span> LOCAL-FIRST ARCHITECTURE</p><div class="flow"><div>CAPTURE<small>本地视频帧</small></div><i>→</i><div>FACEPHYS<small>Pulse / SQI</small></div><i>→</i><div>OUTPUT<small>Browser UI</small></div></div><p>网站由 Vercel 提供静态资源，摄像头画面与模型推理始终留在设备本地。体验更直接，隐私边界也更清晰。</p></div></section>
     </main>
     <footer class="container"><a class="brand" href="#top"><span class="brand-mark">∿</span>OPEN-RPPG</a><span>CAMERA-BASED PULSE · PROCESSED LOCALLY</span><a href="#top">返回顶部 ↑</a></footer>
     <script type="module" src="app.js?v=20260723-motion-v8"></script>

@@ -50,6 +50,7 @@ import {
 } from "./format.js?v=20260719-live-v4";
 
 const waveCtx = ui.waveCanvas?.getContext("2d") || null;
+const isHostedShowcase = window.location.protocol === "https:" && !["localhost", "127.0.0.1"].includes(window.location.hostname);
 
 const state = {
   overlay: null,
@@ -442,6 +443,40 @@ function renderOffline(error) {
   renderAgent({ configured: false, error: "服务离线", history: [], latest: {} });
   renderHighlights({ recording: { enabled: checkedValue(ui.recordingToggle, false), state: "idle" }, items: [] });
   hideBanner(ui.backendWarning);
+}
+
+function showcaseFrameUrl() {
+  const artwork = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"><defs><radialGradient id="g"><stop stop-color="#244a45"/><stop offset="1" stop-color="#090f11"/></radialGradient><linearGradient id="l" x1="0" x2="1"><stop stop-color="#55d2b0" stop-opacity="0"/><stop offset=".5" stop-color="#55d2b0"/><stop offset="1" stop-color="#ff6b83" stop-opacity="0"/></linearGradient></defs><rect width="1280" height="720" fill="url(#g)"/><g stroke="#bceee0" stroke-opacity=".15">${Array.from({ length: 14 }, (_, i) => `<path d="M${i * 100} 0V720"/>`).join("")}${Array.from({ length: 8 }, (_, i) => `<path d="M0 ${i * 100}H1280"/>`).join("")}</g><path d="M0 380 C90 310 140 470 230 382 S390 296 490 392 S650 460 745 366 S920 286 1010 388 S1165 455 1280 350" fill="none" stroke="url(#l)" stroke-width="8"/><circle cx="640" cy="360" r="146" fill="none" stroke="#55d2b0" stroke-opacity=".28" stroke-width="2"/><circle cx="640" cy="360" r="78" fill="#55d2b0" fill-opacity=".08"/><text x="56" y="72" fill="#dceee7" font-family="system-ui" font-size="24" letter-spacing="5">SIGNAL SHOWCASE</text><text x="56" y="112" fill="#83a69c" font-family="system-ui" font-size="18">LOCAL-FIRST VISUAL PREVIEW</text><text x="1070" y="72" fill="#55d2b0" font-family="system-ui" font-size="18">72 BPM</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(artwork)}`;
+}
+
+function renderHostedShowcase() {
+  const now = Date.now() / 1000;
+  const bvp = Array.from({ length: 120 }, (_, index) => Math.sin(index * 0.32) * 0.8 + Math.sin(index * 0.11) * 0.2);
+  const snapshot = normalizeSnapshot({
+    capture: { state: "running", device_index: "showcase", width: 1280, height: 720, input_fps: 29.7, target_fps: 30, read_ms: 4.8, frames_read: 1280, dropped_frames: 1 },
+    model: { ready: true, model: "FacePhys", hr: 72, SQI: 0.82, input_fps: 15, has_face: true, no_face_count: 0, perf: { update_ms: 18, metric_ms: 6 }, waveform: { bvp, ts: bvp.map((_, index) => now - 8 + index * (8 / bvp.length)) } },
+    output: { bpm: 72, confidence: 0.82, status: "stable", reason: "showcase" },
+    settings: { pulse: true, light_enabled: false, brightness: 72, temperature: 4800, light_x: 50, light_y: 38, light_z: 45, light_range: 58, light_angle_enabled: false, light_angle: 0 },
+    agent: { configured: false, history: [], latest: {} },
+    highlights: { recording: { enabled: false, state: "idle" }, items: [] },
+  });
+
+  state.overlay = snapshot;
+  renderDashboard(snapshot);
+  document.querySelectorAll("button, input, textarea, select").forEach((control) => { control.disabled = true; });
+  document.querySelectorAll(".topbar-actions a").forEach((link) => {
+    link.setAttribute("aria-disabled", "true");
+    link.addEventListener("click", (event) => event.preventDefault());
+  });
+  [ui.currentOutputPreview, ui.pairedLightPreview].forEach((preview) => {
+    if (preview) preview.src = showcaseFrameUrl();
+  });
+  setStatePill("SHOWCASE", "waiting");
+  setText(ui.heartTitle, "在线界面展示");
+  setText(ui.heartDescription, "这里展示控制台、信号波形与 Overlay 的网页呈现效果，不请求摄像头或运行模型。");
+  setText(ui.captureHint, "展示数据仅用于说明界面状态与信息层级，不代表实时生命体征结果。");
+  showBanner(ui.backendWarning, "线上展示模式：界面、预览窗口与 Overlay 均可查看；实时采集和补光控制未在此页面启用。", "warn");
 }
 
 function renderFrontendError(error) {
@@ -1208,6 +1243,10 @@ function drawWave() {
 
 function init() {
   validateDom();
+  if (isHostedShowcase) {
+    renderHostedShowcase();
+    return;
+  }
   on(ui.startBtn, "click", startCapture);
   on(ui.stopBtn, "click", stopCapture);
   on(ui.resetBtn, "click", resetModel);
