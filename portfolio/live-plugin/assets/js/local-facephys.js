@@ -4,9 +4,10 @@ import { FacePhysEngine } from "../../../modules/facephys-engine.js?v=20260722-s
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, Number.isFinite(value) ? value : min));
 
 export class LocalFacePhysCapture {
-  constructor(onUpdate, onError) {
+  constructor(onUpdate, onError, onStream) {
     this.onUpdate = onUpdate;
     this.onError = onError;
+    this.onStream = onStream;
     this.stream = null;
     this.tracker = null;
     this.engine = null;
@@ -39,6 +40,7 @@ export class LocalFacePhysCapture {
     this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, min: 20 } }, audio: false });
     this.video.srcObject = this.stream;
     await this.video.play();
+    this.onStream?.(this.stream);
     this.tracker = await FaceTracker.create();
     this.engine = new FacePhysEngine((frame) => this.onFrame(frame), (analysis) => this.onAnalysis(analysis), (error) => this.fail(error));
     await this.engine.initialize();

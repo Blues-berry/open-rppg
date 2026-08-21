@@ -112,8 +112,11 @@ async function startHostedCapture() {
     showBanner(ui.backendWarning, "本地 FacePhys 已启动：摄像头画面、定位与信号计算均在当前浏览器完成，不上传视频。", "warn");
   } catch (error) {
     state.hostedRunning = false;
-    setStatePill("CAMERA BLOCKED", "bad");
-    setText(ui.captureHint, `未取得摄像头权限：${error.message}`);
+    const cameraOpen = Boolean(state.localCapture?.stream);
+    setStatePill(cameraOpen ? "MODEL ERROR" : "CAMERA BLOCKED", "bad");
+    setText(ui.captureHint, cameraOpen
+      ? `摄像头已开启，但本地模型初始化失败：${error.message}`
+      : `未取得摄像头权限：${error.message}`);
   }
 }
 
@@ -1404,6 +1407,12 @@ function initHostedSimulation() {
   }, (error) => {
     setStatePill("LOCAL ERROR", "bad");
     setText(ui.captureHint, `本地 FacePhys 已停止：${error.message}`);
+  }, (stream) => {
+    state.hostedStream = stream;
+    state.hostedRunning = true;
+    applyHostedPreview(readOverlaySettingsFromControls());
+    setStatePill("MODEL LOADING", "warn");
+    setText(ui.captureHint, "摄像头已开启，正在本机加载 FaceTracker 与 FacePhys 模型。");
   });
   on(ui.startBtn, "click", startCapture);
   on(ui.stopBtn, "click", stopCapture);
