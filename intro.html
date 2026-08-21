@@ -120,10 +120,10 @@
 <span class="n">model</span> <span class="o">=</span> <span class="n">rppg</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 
 <span class="c1"># Process a video file</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">process_video</span><span class="p">(</span><span class="s2">&quot;path/to/video.mkv&quot;</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">process_video</span><span class="p">(</span><span class="s2">"path/to/video.mkv"</span><span class="p">)</span>
 
 <span class="c1"># Display the heart rate</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated Heart Rate: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;hr&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> BPM&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimated Heart Rate: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="s1">'hr'</span><span class="p">]</span><span class="si">}</span><span class="s2"> BPM"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -132,7 +132,7 @@
 <section id="offline-video-processing">
 <h3>1. Offline Video Processing<a class="headerlink" href="#offline-video-processing" title="Link to this heading"></a></h3>
 <p>To analyze a pre-recorded video file, use the <code class="docutils literal notranslate"><span class="pre">process_video</span></code> method. This method handles frame extraction, face detection, and signal inference automatically.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">process_video</span><span class="p">(</span><span class="s2">&quot;subject_test.mkv&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">process_video</span><span class="p">(</span><span class="s2">"subject_test.mkv"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Output Structure:</strong>
@@ -175,9 +175,9 @@ The returned dictionary contains the following keys:</p>
         <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="n">last_process_time</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">hr</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">result</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;hr&#39;</span><span class="p">]:</span>
-                <span class="n">current_hr</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;hr&#39;</span><span class="p">]</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real-time HR: </span><span class="si">{</span><span class="n">current_hr</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> BPM&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s1">'hr'</span><span class="p">]:</span>
+                <span class="n">current_hr</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">'hr'</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Real-time HR: </span><span class="si">{</span><span class="n">current_hr</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> BPM"</span><span class="p">)</span>
             <span class="n">last_process_time</span> <span class="o">=</span> <span class="n">now</span>
             
         <span class="c1"># 2. Visualization</span>
@@ -189,12 +189,12 @@ The returned dictionary contains the following keys:</p>
             
             <span class="c1"># Display HR on the frame if available</span>
             <span class="k">if</span> <span class="n">current_hr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;HR: </span><span class="si">{</span><span class="n">current_hr</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">-</span> <span class="mi">10</span><span class="p">),</span> 
+                <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"HR: </span><span class="si">{</span><span class="n">current_hr</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">-</span> <span class="mi">10</span><span class="p">),</span> 
                            <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
         
-        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;rPPG Monitor&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">"rPPG Monitor"</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
         
-        <span class="k">if</span> <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">'q'</span><span class="p">):</span>
             <span class="k">break</span>
 </pre></div>
 </div>
@@ -233,11 +233,11 @@ The returned dictionary contains the following keys:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># tensor shape: (T, H, W, 3)</span>
-<span class="n">video_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">300</span><span class="p">,</span> <span class="mi">480</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span> <span class="c1"># 480p video</span>
+<span class="n">video_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">300</span><span class="p">,</span> <span class="mi">480</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span> <span class="c1"># 480p video</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">process_video_tensor</span><span class="p">(</span><span class="n">video_tensor</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mf">30.0</span><span class="p">)</span>
 
-<span class="n">faces_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">300</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span> <span class="c1"># face array</span>
+<span class="n">faces_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">300</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span> <span class="c1"># face array</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">process_faces_tensor</span><span class="p">(</span><span class="n">faces_tensor</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mf">30.0</span><span class="p">)</span>
 
@@ -248,7 +248,7 @@ The returned dictionary contains the following keys:</p>
 <h3>Model Selection<a class="headerlink" href="#model-selection" title="Link to this heading"></a></h3>
 <p>You can specify different architectures during initialization. The models are categorized by architecture and training configuration (<code class="docutils literal notranslate"><span class="pre">rlap</span></code> or <code class="docutils literal notranslate"><span class="pre">pure</span></code>).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Initialize the PhysMamba model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">rppg</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="s1">&#39;PhysMamba.pure&#39;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">rppg</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="s1">'PhysMamba.pure'</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
