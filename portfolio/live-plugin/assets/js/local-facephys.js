@@ -4,7 +4,8 @@ import { FacePhysEngine } from "../../../modules/facephys-engine.js?v=20260722-s
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, Number.isFinite(value) ? value : min));
 
 export class LocalFacePhysCapture {
-  constructor(onUpdate, onError, onStream) {
+  constructor(video, onUpdate, onError, onStream) {
+    this.video = video;
     this.onUpdate = onUpdate;
     this.onError = onError;
     this.onStream = onStream;
@@ -17,7 +18,6 @@ export class LocalFacePhysCapture {
     this.canvas.width = 36;
     this.canvas.height = 36;
     this.context = this.canvas.getContext("2d", { willReadFrequently: true });
-    this.video = document.createElement("video");
     this.video.autoplay = true;
     this.video.muted = true;
     this.video.playsInline = true;
@@ -26,6 +26,7 @@ export class LocalFacePhysCapture {
     this.lastSampleAt = 0;
     this.lastEngineAt = 0;
     this.lastFrameAt = 0;
+    this.lastEmitAt = 0;
     this.fps = 0;
     this.frames = 0;
     this.waveform = [];
@@ -37,10 +38,12 @@ export class LocalFacePhysCapture {
 
   async start() {
     if (this.running) return this.snapshot();
-    this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, min: 20 } }, audio: false });
-    this.video.srcObject = this.stream;
-    await this.video.play();
-    this.onStream?.(this.stream);
+    if (!this.stream) {
+      this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, min: 20 } }, audio: false });
+      this.video.srcObject = this.stream;
+      await this.video.play();
+      this.onStream?.(this.stream);
+    }
     this.tracker = await FaceTracker.create();
     this.engine = new FacePhysEngine((frame) => this.onFrame(frame), (analysis) => this.onAnalysis(analysis), (error) => this.fail(error));
     await this.engine.initialize();
@@ -73,6 +76,7 @@ export class LocalFacePhysCapture {
     if (!this.running) return;
     if (this.lastFrameAt) this.fps = 1000 / Math.max(1, now - this.lastFrameAt);
     this.lastFrameAt = now;
+    this.frames += 1;
     if (now - this.lastFaceAt > 90) {
       this.lastFaceAt = now;
       try { this.face = this.tracker.detect(this.video, now); } catch { this.face = null; }
@@ -86,7 +90,10 @@ export class LocalFacePhysCapture {
         this.engine.submit(sample, dt, now);
       }
     }
-    this.emit();
+    if (now - this.lastEmitAt >= 120) {
+      this.lastEmitAt = now;
+      this.emit();
+    }
     this.frameRequest = requestAnimationFrame((time) => this.process(time));
   }
 
@@ -111,7 +118,11 @@ export class LocalFacePhysCapture {
     this.waveform.push(frame.value || 0); if (this.waveform.length > 180) this.waveform.shift();
   }
 
-  onAnalysis(analysis) { if (analysis.analysisRevision > this.analysis.analysisRevision) this.analysis = analysis; }
+  onAnalysis(analysis) {
+    if (analysis.analysisRevision <= this.analysis.analysisRevision) return;
+    this.analysis = analysis;
+    this.emit();
+  }
   fail(error) { if (this.running) { this.stop(); this.onError?.(error); } }
   emit() { this.onUpdate?.(this.snapshot()); }
 
@@ -123,7 +134,7 @@ export class LocalFacePhysCapture {
     const now = Date.now() / 1000;
     return {
       local: true,
-      capture: { state: this.running ? "running" : "idle", device_index: "browser", width: this.video.videoWidth || 1280, height: this.video.videoHeight || 720, input_fps: this.running ? this.fps : 0, target_fps: 30, read_ms: 0, frames_read: this.frames += this.running ? 1 : 0, dropped_frames: 0 },
+      capture: { state: this.running ? "running" : this.stream ? "starting" : "idle", device_index: "browser", width: this.video.videoWidth || 1280, height: this.video.videoHeight || 720, input_fps: this.running ? this.fps : 0, target_fps: 30, read_ms: 0, frames_read: this.frames, dropped_frames: 0 },
       model: { ready: this.running, model: "FacePhys · local", hr: bpm, SQI: sqi, input_fps: this.running ? 30 : 0, has_face: hasFace, no_face_count: hasFace ? 0 : 1, hr_window_seconds: 15, perf: { update_ms: 0, metric_ms: 0 }, waveform: { bvp: this.waveform, ts: this.waveform.map((_, index) => now - this.waveform.length / 30 + index / 30) } },
       output: { bpm: ready ? bpm : null, confidence: sqi, status: ready ? "stable" : this.running ? "warming" : "idle", reason: ready ? "local_facephys" : hasFace ? "building_local_window" : "waiting_for_face" },
       settings: { pulse: settings.pulse !== false, light_enabled: Boolean(settings.light_enabled), brightness: Number(settings.brightness || 72), temperature: Number(settings.temperature || 4800), light_x: Number(settings.light_x || 50), light_y: Number(settings.light_y || 38), light_z: Number(settings.light_z || 45), light_range: Number(settings.light_range || 58), light_angle_enabled: Boolean(settings.light_angle_enabled), light_angle: Number(settings.light_angle || 0), light_revision: Date.now() },

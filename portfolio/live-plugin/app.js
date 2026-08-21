@@ -1,1 +1,1 @@
-import "./assets/js/main.js?v=20260821-local-v2";
+import "./assets/js/main.js?v=20260821-local-v3";

@@ -15,7 +15,7 @@ import {
   VIDEO_POLL_INTERVAL_MS,
 } from "./config.js?v=20260719-live-v4";
 import { apiJson } from "./api.js?v=20260719-live-v4";
-import { LocalFacePhysCapture } from "./local-facephys.js?v=20260821-local-v1";
+import { LocalFacePhysCapture } from "./local-facephys.js?v=20260821-local-v2";
 import {
   checkedValue,
   hideBanner,
@@ -87,7 +87,9 @@ async function hostedRequest(action, settings = readOverlaySettingsFromControls(
 
 function applyHostedPreview(settings = {}) {
   [ui.currentOutputPreview, ui.pairedLightPreview].forEach((preview) => {
-    if (preview && "srcObject" in preview) preview.srcObject = state.hostedStream;
+    if (!preview || !("srcObject" in preview) || preview.srcObject === state.hostedStream) return;
+    preview.srcObject = state.hostedStream;
+    if (state.hostedStream) preview.play?.().catch(() => {});
   });
   if (ui.pairedLightPreview) {
     const brightness = settings.light_enabled ? 1 + Number(settings.brightness || 72) / 260 : 1;
@@ -892,6 +894,12 @@ function renderLightPreviewVisibility(settings = {}) {
   setHidden(ui.lightPreviewStream, !enabled);
   toggleClass(ui.pairedPreviewStage, "disabled", !enabled);
   setDatasetFlag(ui.pairedPreviewStage, "disabled", !enabled);
+  if (isHostedShowcase) {
+    if (enabled && ui.pairedLightPreview?.srcObject) ui.pairedLightPreview.play?.().catch(() => {});
+    state.lightPreviewAvailable = true;
+    if (state.overlay) updateLightBackendWarning(state.overlay.settings || {});
+    return;
+  }
   setStreamPaused(ui.pairedLightPreview, !enabled);
   state.lightPreviewAvailable = !enabled ? true : state.lightPreviewAvailable;
   if (state.overlay) updateLightBackendWarning(state.overlay.settings || {});
@@ -1149,15 +1157,23 @@ function renderOutputTelemetry(model, output) {
 
 function renderStateCopy(capture, model, output) {
   if (isHostedShowcase) {
-    if (capture.state !== "running") {
+    if (capture.state === "starting") {
+      setStatePill("MODEL LOADING", "warn");
+      setText(ui.heartTitle, "本地模型加载中");
+      setText(ui.heartDescription, "摄像头画面保持开启，正在加载 FaceTracker 与 FacePhys。");
+      setText(ui.captureHint, "摄像头已开启；模型准备完成后会自动进入本地采集。");
+    } else if (capture.state !== "running") {
+      setStatePill("WAITING", "waiting");
       setText(ui.heartTitle, "等待开始");
       setText(ui.heartDescription, "开启摄像头 → 允许摄像头后，系统将在本机完成人脸定位与信号校准。");
       setText(ui.captureHint, "开启摄像头 → 允许摄像头后，系统将在本机完成人脸定位与信号校准。");
     } else if (!model.has_face) {
+      setStatePill("CAPTURING", "ready");
       setText(ui.heartTitle, "正在寻找人脸");
       setText(ui.heartDescription, "请正对镜头并保持居中，让面部光线尽量均匀。");
       setText(ui.captureHint, "本地 FaceTracker 正在定位人脸；视频帧不会离开浏览器。");
     } else {
+      setStatePill(output.status === "stable" ? "READY" : "CALIBRATING", output.status === "stable" ? "ready" : "warn");
       setText(ui.heartTitle, output.status === "stable" ? "本地信号稳定" : "正在校准信号");
       setText(ui.heartDescription, "FacePhys 正在本机积累 BVP/SQI 窗口。");
       setText(ui.captureHint, "本地 FacePhys 推理运行中；请保持正脸、稳定光线和轻微动作。");
@@ -1399,7 +1415,7 @@ function init() {
 }
 
 function initHostedSimulation() {
-  state.localCapture = new LocalFacePhysCapture((snapshot) => {
+  state.localCapture = new LocalFacePhysCapture(ui.currentOutputPreview, (snapshot) => {
     state.overlay = normalizeSnapshot(snapshot);
     updateHistory(state.overlay);
     renderDashboard(state.overlay);
