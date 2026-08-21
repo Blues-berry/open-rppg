@@ -1,5 +1,6 @@
 import { FaceTracker } from "../../../modules/face-tracker.js?v=20260722-spectrum-v5";
 import { FacePhysEngine } from "../../../modules/facephys-engine.js?v=20260722-spectrum-v5";
+import { evaluateGate } from "../../../modules/quality-gate.js?v=20260722-spectrum-v5";
 
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, Number.isFinite(value) ? value : min));
 
@@ -28,11 +29,13 @@ export class LocalFacePhysCapture {
     this.lastFrameAt = 0;
     this.lastEmitAt = 0;
     this.fps = 0;
+    this.fpsSamples = [];
     this.frames = 0;
     this.waveform = [];
     this.duration = 0;
     this.samples = 0;
     this.analysis = { bpm: null, sqi: 0, analysisRevision: 0 };
+    this.metrics = { brightness: 0, light: 0, motion: 0, face: 0, signal: 0, sqi: 0 };
     this.settings = {};
   }
 
@@ -69,12 +72,19 @@ export class LocalFacePhysCapture {
     this.engine?.reset();
     this.waveform = []; this.duration = 0; this.samples = 0;
     this.analysis = { bpm: null, sqi: 0, analysisRevision: 0 };
+    this.fpsSamples = []; this.fps = 0; this.lastFrameAt = 0;
+    this.metrics = { brightness: 0, light: 0, motion: 0, face: 0, signal: 0, sqi: 0 };
     this.emit();
   }
 
   process(now) {
     if (!this.running) return;
-    if (this.lastFrameAt) this.fps = 1000 / Math.max(1, now - this.lastFrameAt);
+    if (this.lastFrameAt) {
+      this.fpsSamples.push(Math.max(1, now - this.lastFrameAt));
+      if (this.fpsSamples.length > 30) this.fpsSamples.shift();
+      const averageFrameMs = this.fpsSamples.reduce((sum, value) => sum + value, 0) / this.fpsSamples.length;
+      this.fps = 1000 / averageFrameMs;
+    }
     this.lastFrameAt = now;
     this.frames += 1;
     if (now - this.lastFaceAt > 90) {
@@ -85,9 +95,19 @@ export class LocalFacePhysCapture {
       this.lastSampleAt = now;
       const sample = this.sample(this.face.bounds);
       if (sample) {
+        const brightness = sample.brightness;
+        const light = brightness < .16 || brightness > .9 ? .08 : clamp(1 - Math.abs(brightness - .52) / .43);
+        this.metrics = {
+          brightness,
+          light,
+          motion: clamp(this.face.motionQuality),
+          face: clamp(this.face.faceQuality),
+          signal: clamp(this.analysis.signal ?? this.analysis.sqi),
+          sqi: clamp(this.analysis.sqi),
+        };
         const dt = this.lastEngineAt ? (now - this.lastEngineAt) / 1000 : 1 / 30;
         this.lastEngineAt = now;
-        this.engine.submit(sample, dt, now);
+        this.engine.submit(sample.frame, dt, now);
       }
     }
     if (now - this.lastEmitAt >= 120) {
@@ -109,8 +129,13 @@ export class LocalFacePhysCapture {
     this.context.drawImage(this.video, x, y, sampleWidth, sampleHeight, 0, 0, 36, 36);
     const pixels = this.context.getImageData(0, 0, 36, 36).data;
     const frame = new Float32Array(36 * 36 * 3);
-    for (let i = 0, output = 0; i < pixels.length; i += 4) { frame[output++] = pixels[i] / 255; frame[output++] = pixels[i + 1] / 255; frame[output++] = pixels[i + 2] / 255; }
-    return frame;
+    let luminance = 0;
+    for (let i = 0, output = 0; i < pixels.length; i += 4) {
+      const red = pixels[i] / 255; const green = pixels[i + 1] / 255; const blue = pixels[i + 2] / 255;
+      frame[output++] = red; frame[output++] = green; frame[output++] = blue;
+      luminance += red * .2126 + green * .7152 + blue * .0722;
+    }
+    return { frame, brightness: luminance / (36 * 36) };
   }
 
   onFrame(frame) {
@@ -121,6 +146,8 @@ export class LocalFacePhysCapture {
   onAnalysis(analysis) {
     if (analysis.analysisRevision <= this.analysis.analysisRevision) return;
     this.analysis = analysis;
+    this.metrics.signal = clamp(analysis.signal ?? analysis.sqi);
+    this.metrics.sqi = clamp(analysis.sqi);
     this.emit();
   }
   fail(error) { if (this.running) { this.stop(); this.onError?.(error); } }
@@ -128,15 +155,19 @@ export class LocalFacePhysCapture {
 
   snapshot(settings = this.settings) {
     const hasFace = Boolean(this.face?.valid);
-    const sqi = Number(this.analysis.sqi || 0);
-    const bpm = Number.isFinite(this.analysis.bpm) ? this.analysis.bpm : null;
-    const ready = this.duration >= 15 && sqi >= .2 && bpm;
+    const sqi = clamp(this.analysis.sqi);
+    const candidateBpm = Number(this.analysis.bpm);
+    // FacePhys estimates outside this physiological range are transient detector artefacts.
+    const bpm = Number.isFinite(candidateBpm) && candidateBpm >= 38 && candidateBpm <= 220 ? candidateBpm : null;
+    const metrics = { ...this.metrics, fps: this.fps, signal: clamp(this.analysis.signal ?? sqi), sqi };
+    const gate = evaluateGate(metrics, { bpm, duration: this.duration, sqi }, 15);
+    const ready = gate.accepted;
     const now = Date.now() / 1000;
     return {
       local: true,
       capture: { state: this.running ? "running" : this.stream ? "starting" : "idle", device_index: "browser", width: this.video.videoWidth || 1280, height: this.video.videoHeight || 720, input_fps: this.running ? this.fps : 0, target_fps: 30, read_ms: 0, frames_read: this.frames, dropped_frames: 0 },
-      model: { ready: this.running, model: "FacePhys · local", hr: bpm, SQI: sqi, input_fps: this.running ? 30 : 0, has_face: hasFace, no_face_count: hasFace ? 0 : 1, hr_window_seconds: 15, perf: { update_ms: 0, metric_ms: 0 }, waveform: { bvp: this.waveform, ts: this.waveform.map((_, index) => now - this.waveform.length / 30 + index / 30) } },
-      output: { bpm: ready ? bpm : null, confidence: sqi, status: ready ? "stable" : this.running ? "warming" : "idle", reason: ready ? "local_facephys" : hasFace ? "building_local_window" : "waiting_for_face" },
+      model: { ready: this.running, model: "FacePhys · local", hr: bpm, SQI: sqi, input_fps: this.running ? this.fps : 0, has_face: hasFace, no_face_count: hasFace ? 0 : 1, hr_window_seconds: 15, metrics, perf: { update_ms: 0, metric_ms: 0 }, waveform: { bvp: this.waveform, ts: this.waveform.map((_, index) => now - this.waveform.length / 30 + index / 30) } },
+      output: { bpm: ready ? bpm : null, confidence: sqi, status: ready ? "stable" : this.running ? "warming" : "idle", reason: ready ? "local_facephys" : gate.code === "face" ? "waiting_for_face" : gate.code },
       settings: { pulse: settings.pulse !== false, light_enabled: Boolean(settings.light_enabled), brightness: Number(settings.brightness || 72), temperature: Number(settings.temperature || 4800), light_x: Number(settings.light_x || 50), light_y: Number(settings.light_y || 38), light_z: Number(settings.light_z || 45), light_range: Number(settings.light_range || 58), light_angle_enabled: Boolean(settings.light_angle_enabled), light_angle: Number(settings.light_angle || 0), light_revision: Date.now() },
       agent: { configured: false, history: [], latest: {} }, highlights: { recording: { enabled: false, state: "unavailable" }, items: [] },
     };

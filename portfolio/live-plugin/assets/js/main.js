@@ -15,7 +15,7 @@ import {
   VIDEO_POLL_INTERVAL_MS,
 } from "./config.js?v=20260719-live-v4";
 import { apiJson } from "./api.js?v=20260719-live-v4";
-import { LocalFacePhysCapture } from "./local-facephys.js?v=20260821-local-v2";
+import { LocalFacePhysCapture } from "./local-facephys.js?v=20260821-local-v3";
 import {
   checkedValue,
   hideBanner,
@@ -91,11 +91,26 @@ function applyHostedPreview(settings = {}) {
     preview.srcObject = state.hostedStream;
     if (state.hostedStream) preview.play?.().catch(() => {});
   });
-  if (ui.pairedLightPreview) {
-    const brightness = settings.light_enabled ? 1 + Number(settings.brightness || 72) / 260 : 1;
-    ui.pairedLightPreview.style.setProperty("--sim-light-brightness", String(brightness));
-    ui.pairedLightPreview.style.setProperty("--sim-light-warmth", settings.light_enabled ? String(Math.max(0, (Number(settings.temperature || 4800) - 3500) / 5000)) : "0");
-    ui.pairedLightPreview.style.setProperty("--sim-light-zoom", settings.light_enabled ? String(1 + Number(settings.light_range || 58) / 1800) : "1");
+  if (ui.pairedLightPreview && ui.pairedPreviewStage) {
+    const enabled = Boolean(settings.light_enabled);
+    const strength = clamp(Number(settings.brightness || 72), 0, 100) / 100;
+    const temperature = clamp(Number(settings.temperature || 4800), 2700, 6500);
+    const cool = (temperature - 2700) / 3800;
+    const red = Math.round(255 - cool * 65);
+    const green = Math.round(183 + cool * 50);
+    const blue = Math.round(106 + cool * 149);
+    const range = clamp(Number(settings.light_range || 58), 10, 100);
+    const depth = clamp(Number(settings.light_z || 45), 0, 100);
+    const stage = ui.pairedPreviewStage.style;
+    stage.setProperty("--sim-light-x", `${clamp(Number(settings.light_x || 50), 0, 100)}%`);
+    stage.setProperty("--sim-light-y", `${clamp(Number(settings.light_y || 38), 0, 100)}%`);
+    stage.setProperty("--sim-light-size", `${35 + range * .95 + (100 - depth) * .18}%`);
+    stage.setProperty("--sim-light-size-y", `${25 + range * .68 + (100 - depth) * .13}%`);
+    stage.setProperty("--sim-light-opacity", enabled ? String(.12 + strength * .62 * (1 - depth / 260)) : "0");
+    stage.setProperty("--sim-light-color", `${red}, ${green}, ${blue}`);
+    stage.setProperty("--sim-light-angle", `${Number(settings.light_angle || 0)}deg`);
+    ui.pairedLightPreview.style.setProperty("--sim-light-brightness", enabled ? String(1 + strength * .18) : "1");
+    ui.pairedLightPreview.style.setProperty("--sim-light-contrast", enabled ? String(1 + strength * .05) : "1");
   }
 }
 
@@ -142,8 +157,12 @@ function canHoldPreviousBpm(capture, output) {
   return capture.state === "running" && output.status === "warming" && output.reason === "no_recent_input";
 }
 
+function safeBpm(value) {
+  return Number.isFinite(value) && value >= 38 && value <= 220 ? value : null;
+}
+
 function displayBpmFromOutput(capture, output) {
-  const bpm = Number.isFinite(output.bpm) ? output.bpm : null;
+  const bpm = safeBpm(output.bpm);
   if (bpm != null) {
     state.lastOutputBpm = bpm;
     state.lastOutputBpmAt = Date.now();
@@ -1104,9 +1123,9 @@ function renderHeart(capture, model, output) {
   const captureRunning = capture.state === "running";
   const confidence = clamp(Number(output.confidence || 0));
   const confidencePct = Math.round(confidence * 100);
-  const bpm = Number.isFinite(output.bpm) ? output.bpm : null;
+  const bpm = safeBpm(output.bpm);
   const displayBpm = displayBpmFromOutput(capture, output);
-  const previewBpm = Number.isFinite(model.hr) ? Math.round(model.hr) : null;
+  const previewBpm = safeBpm(model.hr);
   const windowSeconds = hrWindowSeconds(model);
 
   setText(ui.bpmValue, displayBpm == null ? "--" : String(displayBpm));
@@ -1242,10 +1261,11 @@ function renderPerf(capture, model, output) {
 }
 
 function renderQuality(capture, model) {
-  const captureScore = capture.state === "running" && Number.isFinite(capture.input_fps)
-    ? clamp(capture.input_fps / Math.max(1, capture.target_fps || 30))
+  const metrics = model.metrics || {};
+  const captureScore = capture.state === "running" && Number.isFinite(metrics.fps ?? capture.input_fps)
+    ? clamp((metrics.fps ?? capture.input_fps) / Math.max(1, capture.target_fps || 30))
     : 0;
-  const faceScore = model.has_face ? 1 : 0;
+  const faceScore = Number.isFinite(metrics.face) ? clamp(metrics.face) : model.has_face ? 1 : 0;
   const sqiScore = clamp(Number(model.SQI || 0));
 
   setMeter(ui.brightnessMeter, captureScore);

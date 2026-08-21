@@ -161,6 +161,26 @@
 .paired-preview-stage {
   cursor: crosshair;
   touch-action: none;
+  --sim-light-x: 50%;
+  --sim-light-y: 38%;
+  --sim-light-size: 80%;
+  --sim-light-size-y: 58%;
+  --sim-light-opacity: 0;
+  --sim-light-color: 225, 205, 180;
+  --sim-light-angle: 0deg;
+}
+
+.paired-preview-stage::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -12%;
+  pointer-events: none;
+  opacity: var(--sim-light-opacity);
+  background: radial-gradient(ellipse var(--sim-light-size) var(--sim-light-size-y) at var(--sim-light-x) var(--sim-light-y), rgba(var(--sim-light-color), .86) 0%, rgba(var(--sim-light-color), .28) 30%, transparent 71%);
+  mix-blend-mode: screen;
+  transform: rotate(var(--sim-light-angle));
+  transition: opacity 140ms ease, background 140ms ease, transform 140ms ease;
 }
 
 .paired-preview-stage.disabled {
@@ -176,9 +196,8 @@
 }
 
 #pairedLightPreview {
-  filter: brightness(var(--sim-light-brightness, 1)) sepia(var(--sim-light-warmth, 0));
-  transform: scale(var(--sim-light-zoom, 1));
-  transition: filter 140ms ease, transform 140ms ease;
+  filter: brightness(var(--sim-light-brightness, 1)) contrast(var(--sim-light-contrast, 1));
+  transition: filter 140ms ease;
 }
 
 .output-telemetry-panel {
